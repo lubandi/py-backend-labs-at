@@ -6,20 +6,24 @@ Simple argparse-based CLI for beginners.
 import argparse
 import logging
 import sys
-from parser.parser import CSVParser
 from pathlib import Path
 
-from exceptions.exceptions import ImporterError
-from models.models import ImportResult, User
-from repository.repository import UserRepository
-from validator.validator import UserValidator
+from importer_cli.exceptions.exceptions import ImporterError
+from importer_cli.models.models import ImportResult, User
+from importer_cli.parser.parser import CSVParser
+from importer_cli.repository.repository import UserRepository
+from importer_cli.validator.validator import UserValidator
+
+# Create logs directory if it doesn't exist
+log_dir = Path("logs")
+log_dir.mkdir(exist_ok=True, parents=True)
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("logs/importer.log"),
+        logging.FileHandler(log_dir / "importer.log"),
         logging.StreamHandler(sys.stdout),
     ],
 )
@@ -87,9 +91,7 @@ class ResilientImporter:
                 except Exception as e:
                     # Handle unexpected errors
                     error_msg = f"Unexpected error: {e}"
-                    self.result.add_error(
-                        self.result.total_processed, error_msg
-                    )
+                    self.result.add_error(self.result.total_processed, error_msg)
                     logger.error(error_msg)
 
         except ImporterError as e:
@@ -233,9 +235,7 @@ def create_parser():
     list_parser.set_defaults(func=list_users_command)
 
     # Find user command
-    find_parser = subparsers.add_parser(
-        "find-user", help="Find a specific user by ID"
-    )
+    find_parser = subparsers.add_parser("find-user", help="Find a specific user by ID")
     find_parser.add_argument("user_id", help="User ID to search for")
     find_parser.set_defaults(func=find_user_command)
 

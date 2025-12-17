@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import Any, Iterator
 
-from exceptions.exceptions import CSVFormatError, MissingFileError
+from importer_cli.exceptions.exceptions import CSVFormatError, MissingFileError
 
 logger = logging.getLogger(__name__)
 
