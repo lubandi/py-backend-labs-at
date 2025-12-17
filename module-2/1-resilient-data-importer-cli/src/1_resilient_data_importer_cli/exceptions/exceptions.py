@@ -77,3 +77,9 @@ class ValidationError(ImporterError):
         super().__init__(f"{message}: {field}={value}")
         self.field = field
         self.value = value
+
+
+class DatabaseError(ImporterError):
+    """Base exception for database-related errors."""
+
+    pass
