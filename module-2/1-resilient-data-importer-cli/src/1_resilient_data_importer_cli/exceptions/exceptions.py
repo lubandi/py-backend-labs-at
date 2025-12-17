@@ -37,7 +37,9 @@ class CSVFormatError(FileFormatError):
     def __str__(self) -> str:
         base_msg = super().__str__()
         if self.line_number and self.line_content:
-            return f"{base_msg} at line {self.line_number}: {self.line_content}"
+            return (
+                f"{base_msg} at line {self.line_number}: {self.line_content}"
+            )
         elif self.line_number:
             return f"{base_msg} at line {self.line_number}"
         return base_msg
