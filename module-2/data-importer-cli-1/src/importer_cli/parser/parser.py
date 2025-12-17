@@ -8,9 +8,9 @@ import logging
 from pathlib import Path
 from typing import Iterator
 
-from context_manager.file_handler import CSVFileReader
-from exceptions.exceptions import CSVFormatError, ValidationError
-from models.models import User
+from importer_cli.context_manager.file_handler import CSVFileReader
+from importer_cli.exceptions.exceptions import CSVFormatError, ValidationError
+from importer_cli.models.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -58,9 +58,7 @@ class CSVParser:
 
                     # Skip empty rows
                     if not row or all(cell.strip() == "" for cell in row):
-                        logger.warning(
-                            f"Skipping empty row at line {line_number}"
-                        )
+                        logger.warning(f"Skipping empty row at line {line_number}")
                         continue
 
                     # Parse user data
@@ -76,9 +74,7 @@ class CSVParser:
                     logger.error(f"Error at line {line_number}: {e}")
                     raise
                 except Exception as e:
-                    logger.error(
-                        f"Unexpected error at line {line_number}: {e}"
-                    )
+                    logger.error(f"Unexpected error at line {line_number}: {e}")
                     raise CSVFormatError(
                         f"Unexpected error at line {line_number}",
                         line_number=line_number,
@@ -122,9 +118,7 @@ class CSVParser:
         logger.debug(f"Validated header: {normalized_header}")
         return normalized_header
 
-    def _parse_row(
-        self, row: list[str], header: list[str], line_number: int
-    ) -> User:
+    def _parse_row(self, row: list[str], header: list[str], line_number: int) -> User:
         """
         Parse a single CSV row into a User object.
 

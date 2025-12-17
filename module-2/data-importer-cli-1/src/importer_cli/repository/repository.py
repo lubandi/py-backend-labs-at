@@ -9,9 +9,9 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from context_manager.file_handler import JSONFileHandler
-from exceptions.exceptions import DuplicateUserError
-from models.models import User
+from importer_cli.context_manager.file_handler import JSONFileHandler
+from importer_cli.exceptions.exceptions import DuplicateUserError
+from importer_cli.models.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +28,7 @@ class UserRepository:
         """
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        logger.info(
-            f"Initialized UserRepository with database: {self.db_path}"
-        )
+        logger.info(f"Initialized UserRepository with database: {self.db_path}")
 
     def _load_data(self) -> Dict[str, Dict[str, str]]:
         """
@@ -52,9 +50,7 @@ class UserRepository:
                     return {}
                 return data
         except FileNotFoundError:
-            logger.info(
-                f"Database file {self.db_path} not found, creating new"
-            )
+            logger.info(f"Database file {self.db_path} not found, creating new")
             return {}
         except Exception as e:
             logger.error(f"Error loading database: {e}")

@@ -7,8 +7,8 @@ This module provides validation functions for user data.
 import logging
 import re
 
-from exceptions.exceptions import ValidationError
-from models.models import User
+from importer_cli.exceptions.exceptions import ValidationError
+from importer_cli.models.models import User
 
 logger = logging.getLogger(__name__)
 
