@@ -8,7 +8,11 @@ import logging
 import sys
 from pathlib import Path
 
-from importer_cli.exceptions.exceptions import ImporterError
+from importer_cli.exceptions.exceptions import (
+    DuplicateUserError,
+    ImporterError,
+    MissingFileError,
+)
 from importer_cli.models.models import ImportResult, User
 from importer_cli.parser.parser import CSVParser
 from importer_cli.repository.repository import UserRepository
@@ -79,30 +83,40 @@ class ResilientImporter:
                     )
 
                     # Save to repository
-                    self.repository.save(user)
-                    self.result.add_success()
-                    logger.info(f"Successfully imported user: {user.user_id}")
+                    try:
+                        self.repository.save(user)
+                        self.result.add_success()
+                        logger.info(f"Successfully imported user: {user.user_id}")
+                    except DuplicateUserError as de:
+                        # Count duplicates without raising
+                        self.result.duplicates_skipped += 1
+                        self.result.add_error(self.result.total_processed, str(de))
+                        logger.warning(f"Duplicate user skipped: {de}")
 
                 except ImporterError as e:
-                    # Handle known importer errors
+                    # Handle validation or parser row-level errors
+                    self.result.failed += 1
                     self.result.add_error(self.result.total_processed, str(e))
                     logger.error(f"Failed to import user: {e}")
 
                 except Exception as e:
-                    # Handle unexpected errors
-                    error_msg = f"Unexpected error: {e}"
+                    # Catch unexpected errors per row
+                    self.result.failed += 1
+                    error_msg = f"Unexpected import error: {e}"
                     self.result.add_error(self.result.total_processed, error_msg)
                     logger.error(error_msg)
 
-        except ImporterError as e:
-            # Handle parser-level errors
-            logger.error(f"Parser error: {e}")
-            self.result.add_error(0, f"Parser error: {e}")
+        except MissingFileError as mfe:
+            # CSV file missing
+            logger.error(f"File not found: {self.csv_path}")
+            self.result.failed += 1
+            self.result.add_error(0, str(mfe))
 
         except Exception as e:
-            # Handle unexpected top-level errors
+            # Any other top-level errors
             error_msg = f"Unexpected error during import: {e}"
             logger.error(error_msg)
+            self.result.failed += 1
             self.result.add_error(0, error_msg)
 
         logger.info(f"Import completed: {self.result}")

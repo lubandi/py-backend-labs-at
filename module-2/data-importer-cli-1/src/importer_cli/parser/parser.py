@@ -48,28 +48,29 @@ class CSVParser:
         logger.info(f"Starting parsing of {self.csv_path}")
 
         with CSVFileReader(self.csv_path) as reader:
-            header = None
-            for line_number, row in enumerate(reader, start=1):
+            try:
+                first_row = next(reader, None)  # Try to get first row
+            except StopIteration:
+                first_row = None
+
+            if first_row is None:
+                # File is empty
+                raise CSVFormatError("CSV file is empty", line_number=1)
+
+            # Validate header immediately
+            header = self._validate_header(first_row)
+
+            # Now process the rest of the rows
+            for line_number, row in enumerate(reader, start=2):
+                if not row or all(cell.strip() == "" for cell in row):
+                    logger.warning(f"Skipping empty row at line {line_number}")
+                    continue
                 try:
-                    # First row should be header
-                    if line_number == 1:
-                        header = self._validate_header(row)
-                        continue
-
-                    # Skip empty rows
-                    if not row or all(cell.strip() == "" for cell in row):
-                        logger.warning(f"Skipping empty row at line {line_number}")
-                        continue
-
-                    # Parse user data
                     user = self._parse_row(row, header, line_number)
                     yield user
-
                     logger.debug(
-                        f"""Successfully parsed user at line
-                        {line_number}: {user.user_id}"""
+                        f"Successfully parsed user at line {line_number}: {user.user_id}"
                     )
-
                 except (CSVFormatError, ValidationError) as e:
                     logger.error(f"Error at line {line_number}: {e}")
                     raise

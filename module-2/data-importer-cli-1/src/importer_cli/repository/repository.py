@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from importer_cli.context_manager.file_handler import JSONFileHandler
-from importer_cli.exceptions.exceptions import DuplicateUserError
+from importer_cli.exceptions.exceptions import DuplicateUserError, MissingFileError
 from importer_cli.models.models import User
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class UserRepository:
                     )
                     return {}
                 return data
-        except FileNotFoundError:
+        except (FileNotFoundError, MissingFileError):  # CATCH BOTH!
             logger.info(f"Database file {self.db_path} not found, creating new")
             return {}
         except Exception as e:
@@ -64,8 +64,14 @@ class UserRepository:
             data: Dictionary of user data to save.
         """
         try:
-            with JSONFileHandler(self.db_path, mode="w") as handler:
+            # Create the handler object
+            handler = JSONFileHandler(self.db_path, mode="w")
+
+            # Enter the context manager
+            with handler:
+                # Call write_data on the handler object
                 handler.write_data(data)
+
             logger.debug(f"Database saved to {self.db_path}")
         except Exception as e:
             logger.error(f"Error saving database: {e}")
