@@ -1,6 +1,6 @@
 """
 Command Line Interface for the Resilient Data Importer.
-Simple argparse-based CLI for beginners.
+Simple argparse-based CLI.
 """
 
 import argparse
@@ -124,154 +124,44 @@ class ResilientImporter:
 
 
 def import_csv_command(args):
-    """Handle the import-csv command."""
+    """Handle the CSV import."""
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-        logger.debug("Verbose logging enabled")
 
-    print(f"Starting import from {args.csv_file}...")
+    importer = ResilientImporter(args.csv_file, args.db_file)
+    result = importer.import_users()
 
-    try:
-        importer = ResilientImporter(args.csv_file, args.db_file)
-        result = importer.import_users()
+    # Print summary
+    print(f"✅ Successfully imported {result.successful} users.")
+    if result.failed > 0:
+        print(f"❌ Failed to import {result.failed} users.")
+    if result.duplicates_skipped > 0:
+        print(f"⚠️  Skipped {result.duplicates_skipped} duplicate users.")
 
-        # Display results
-        print("\n" + "=" * 50)
-        print(str(result))
-        print("=" * 50)
-
-        if result.errors:
-            print("\nErrors encountered:")
-            for line_num, error in result.errors:
-                print(f"  Line {line_num}: {error}")
-
-        if result.successful > 0:
-            print(f"\n✅ Successfully imported {result.successful} users.")
-        if result.failed > 0:
-            print(f"❌ Failed to import {result.failed} users.")
-        if result.duplicates_skipped > 0:
-            print(f"⚠️  Skipped {result.duplicates_skipped} duplicate users.")
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        sys.exit(1)
-
-
-def list_users_command(args):
-    """Handle the list-users command."""
-    try:
-        repo = UserRepository(args.db_file)
-        users = repo.find_all()
-
-        if not users:
-            print("No users found in the database.")
-            return
-
-        print(f"Found {len(users)} users:\n")
-        for user in users:
-            print(f"  ID: {user.user_id}")
-            print(f"  Name: {user.name}")
-            print(f"  Email: {user.email}")
-            print("-" * 30)
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        sys.exit(1)
-
-
-def find_user_command(args):
-    """Handle the find-user command."""
-    try:
-        repo = UserRepository(args.db_file)
-        user = repo.find_by_id(args.user_id)
-
-        if user:
-            print("User found:\n")
-            print(f"  ID: {user.user_id}")
-            print(f"  Name: {user.name}")
-            print(f"  Email: {user.email}")
-        else:
-            print(f"User with ID '{args.user_id}' not found.")
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        sys.exit(1)
-
-
-def clear_db_command(args):
-    """Handle the clear-db command."""
-    confirm = input("Are you sure you want to clear the database? (yes/no): ")
-    if confirm.lower() == "yes":
-        try:
-            repo = UserRepository(args.db_file)
-            repo.clear()
-            print("✅ Database cleared successfully.")
-        except Exception as e:
-            print(f"❌ Error: {e}")
-            sys.exit(1)
-    else:
-        print("Operation cancelled.")
-
-
-def create_parser():
-    """Create the argument parser with all commands."""
-    parser = argparse.ArgumentParser(
-        description="Resilient Data Importer - Import user data from CSV files"
-    )
-
-    # Global options
-    parser.add_argument(
-        "--db-file",
-        default="data/users.json",
-        help="Path to the JSON database file (default: data/users.json)",
-    )
-
-    subparsers = parser.add_subparsers(
-        title="commands", dest="command", help="Available commands"
-    )
-
-    # Import CSV command
-    import_parser = subparsers.add_parser(
-        "import-csv", help="Import users from a CSV file"
-    )
-    import_parser.add_argument(
-        "csv_file", help="Path to the CSV file containing user data"
-    )
-    import_parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose logging"
-    )
-    import_parser.set_defaults(func=import_csv_command)
-
-    # List users command
-    list_parser = subparsers.add_parser(
-        "list-users", help="List all users in the database"
-    )
-    list_parser.set_defaults(func=list_users_command)
-
-    # Find user command
-    find_parser = subparsers.add_parser("find-user", help="Find a specific user by ID")
-    find_parser.add_argument("user_id", help="User ID to search for")
-    find_parser.set_defaults(func=find_user_command)
-
-    # Clear database command
-    clear_parser = subparsers.add_parser(
-        "clear-db", help="Clear all users from the database"
-    )
-    clear_parser.set_defaults(func=clear_db_command)
-
-    return parser
+    # Optional: detailed errors
+    if result.errors:
+        print("Errors encountered:")
+        for line_num, error in result.errors:
+            print(f"Line {line_num}: {error}")
 
 
 def main():
-    """Entry point for the CLI."""
-    parser = create_parser()
+    parser = argparse.ArgumentParser(description="Resilient Data Importer CLI")
+    parser.add_argument("csv_file", help="Path to the CSV file")
+    parser.add_argument(
+        "--db-file", default="data/users.json", help="JSON database file"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable verbose logging"
+    )
     args = parser.parse_args()
 
-    if args.command is None:
+    # Print help if no arguments
+    if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
 
-    args.func(args)
+    import_csv_command(args)
 
 
 if __name__ == "__main__":
