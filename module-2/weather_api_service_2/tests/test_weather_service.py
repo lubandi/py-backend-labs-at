@@ -1,6 +1,7 @@
 """Tests for Weather Service"""
 import pytest
 from weather_api_service_2.exceptions import CityNotFoundError, InvalidAPIKeyError
+from weather_api_service_2.providers import MockWeatherProvider
 from weather_api_service_2.service import WeatherService
 
 
@@ -68,3 +69,24 @@ class TestWeatherService:
 
         # Verify error was logged
         mock_logger.error.assert_called_once()
+
+    def test_service_uses_provider_dependency(self):
+        """Test that WeatherService uses dependency injection"""
+        # Arrange
+        mock_provider = MockWeatherProvider()
+        service = WeatherService(weather_provider=mock_provider)
+
+        # Act
+        result = service.get_forecast("London")
+
+        # Assert
+        assert result["city"] == "London"
+
+    def test_service_without_provider_creates_default(self):
+        """Test that service creates default provider if none provided"""
+        # Arrange & Act
+        service = WeatherService()
+        result = service.get_forecast("London")
+
+        # Assert
+        assert result["city"] == "London"
