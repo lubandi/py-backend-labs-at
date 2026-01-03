@@ -1,4 +1,6 @@
 """Tests for Weather Service"""
+import pytest
+from weather_api_service_2.exceptions import CityNotFoundError, InvalidAPIKeyError
 from weather_api_service_2.service import WeatherService
 
 
@@ -19,3 +21,50 @@ class TestWeatherService:
         assert result["city"] == city
         assert "temperature" in result
         assert "condition" in result
+
+    def test_get_forecast_unknown_city(self):
+        """Test that unknown city raises CityNotFoundError"""
+        # Arrange
+        service = WeatherService()
+        city = "UnknownCity"
+
+        # Act & Assert
+        with pytest.raises(CityNotFoundError):
+            service.get_forecast(city)
+
+    def test_get_forecast_with_api_key_invalid(self):
+        """Test that invalid API key raises InvalidAPIKeyError"""
+        # Arrange
+        service = WeatherService(api_key="invalid-key")
+        city = "London"
+
+        # Act & Assert
+        with pytest.raises(InvalidAPIKeyError):
+            service.get_forecast(city)
+
+    def test_logging_on_success(self, mocker):
+        """Test that logging occurs on successful forecast retrieval"""
+        # Arrange
+        mock_logger = mocker.Mock()
+        service = WeatherService()
+        service.logger = mock_logger
+
+        # Act
+        service.get_forecast("London")
+
+        # Assert
+        assert mock_logger.info.call_count >= 2
+
+    def test_logging_on_error(self, mocker):
+        """Test that logging occurs on error"""
+        # Arrange
+        mock_logger = mocker.Mock()
+        service = WeatherService(api_key="invalid")
+        service.logger = mock_logger
+
+        # Act & Assert
+        with pytest.raises(InvalidAPIKeyError):
+            service.get_forecast("London")
+
+        # Verify error was logged
+        mock_logger.error.assert_called_once()
