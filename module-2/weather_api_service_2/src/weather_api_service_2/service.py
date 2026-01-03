@@ -1,4 +1,9 @@
-"""Weather Service module"""
+"""
+Weather API Service module.
+
+This module provides a WeatherService class that follows TDD and SOLID principles.
+"""
+
 from typing import Any, Dict, Optional
 
 from weather_api_service_2.exceptions import CityNotFoundError, InvalidAPIKeyError
@@ -7,14 +12,31 @@ from weather_api_service_2.providers import MockWeatherProvider, WeatherProvider
 
 
 class WeatherService:
-    """Weather API Service following SOLID principles"""
+    """
+    Weather API Service that provides weather forecasts.
+
+    This service uses dependency injection to allow different weather providers
+    and follows the SOLID principles for clean architecture.
+
+    Attributes:
+        api_key (str): API key for authentication
+        logger (StructuredLogger): Logger for structured logging
+        weather_provider (WeatherProvider): Provider for weather data
+    """
 
     def __init__(
         self,
         api_key: Optional[str] = "valid-key",
         weather_provider: Optional[WeatherProvider] = None,
-    ):
-        """Initialize WeatherService with dependency injection"""
+    ) -> None:
+        """
+        Initialize WeatherService.
+
+        Args:
+            api_key: Optional API key for authentication. Defaults to "valid-key".
+            weather_provider: Optional weather provider. If not provided,
+                            a MockWeatherProvider is used.
+        """
         self.api_key = api_key
         self.logger = StructuredLogger(__name__)
 
@@ -22,7 +44,25 @@ class WeatherService:
         self.weather_provider = weather_provider or MockWeatherProvider()
 
     def get_forecast(self, city: str) -> Dict[str, Any]:
-        """Get weather forecast for a city"""
+        """
+        Get weather forecast for a specified city.
+
+        Args:
+            city: Name of the city to get forecast for.
+
+        Returns:
+            Dictionary containing weather forecast data.
+
+        Raises:
+            InvalidAPIKeyError: If the provided API key is invalid.
+            CityNotFoundError: If the city is not found in the provider's data.
+
+        Examples:
+            >>> service = WeatherService()
+            >>> forecast = service.get_forecast("London")
+            >>> print(forecast["temperature"])
+            15.5
+        """
         self.logger.info("Weather forecast request received", city=city)
 
         # Check API key
