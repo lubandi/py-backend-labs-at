@@ -1,18 +1,28 @@
 """
 CSV parser module for reading and parsing user data.
 
-This module handles CSV parsing with robust error handling and validation.
+This module handles CSV parsing with robust error handling.
 """
 
 import logging
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 
 from importer_cli.context_manager.file_handler import CSVFileReader
-from importer_cli.exceptions.exceptions import CSVFormatError, ValidationError
-from importer_cli.models.models import User
+from importer_cli.exceptions.exceptions import CSVFormatError
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class RawUserData:
+    """Container for raw, unvalidated user data from CSV."""
+
+    user_id: str
+    name: str
+    email: str
+    line_number: int
 
 
 class CSVParser:
@@ -34,52 +44,52 @@ class CSVParser:
         self.csv_path = Path(csv_path)
         logger.info(f"Initialized CSV parser for: {self.csv_path}")
 
-    def parse(self) -> Iterator[User]:
+    def parse(self) -> Iterator[RawUserData]:
         """
-        Parse the CSV file and yield User objects.
+        Parse the CSV file and yield raw user data.
 
         Yields:
-            User: Parsed user objects.
+            RawUserData: Parsed but unvalidated user data.
 
         Raises:
             CSVFormatError: If CSV format is invalid.
-            ValidationError: If data validation fails.
         """
         logger.info(f"Starting parsing of {self.csv_path}")
 
         with CSVFileReader(self.csv_path) as reader:
-            header = None
-            for line_number, row in enumerate(reader, start=1):
+            try:
+                first_row = next(reader, None)  # Try to get first row
+            except StopIteration:
+                first_row = None
+
+            if first_row is None:
+                # File is empty
+                raise CSVFormatError("CSV file is empty", line_number=1)
+
+            # Validate header immediately
+            header = self._validate_header(first_row)
+
+            # Now process the rest of the rows
+            for line_number, row in enumerate(reader, start=2):
+                if not row or all(cell.strip() == "" for cell in row):
+                    logger.warning(f"Skipping empty row at line {line_number}")
+                    continue
+
                 try:
-                    # First row should be header
-                    if line_number == 1:
-                        header = self._validate_header(row)
-                        continue
-
-                    # Skip empty rows
-                    if not row or all(cell.strip() == "" for cell in row):
-                        logger.warning(f"Skipping empty row at line {line_number}")
-                        continue
-
-                    # Parse user data
-                    user = self._parse_row(row, header, line_number)
-                    yield user
-
-                    logger.debug(
-                        f"""Successfully parsed user at line
-                        {line_number}: {user.user_id}"""
-                    )
-
-                except (CSVFormatError, ValidationError) as e:
-                    logger.error(f"Error at line {line_number}: {e}")
-                    raise
+                    raw_data = self._parse_row(row, header, line_number)
+                    if raw_data:
+                        yield raw_data
+                        logger.debug(
+                            f"Successfully parsed raw data at line {line_number}"
+                        )
+                except CSVFormatError as e:
+                    # Log but continue processing other rows
+                    logger.error(f"CSV format error at line {line_number}: {e}")
+                    continue
                 except Exception as e:
+                    # Log unexpected errors but continue
                     logger.error(f"Unexpected error at line {line_number}: {e}")
-                    raise CSVFormatError(
-                        f"Unexpected error at line {line_number}",
-                        line_number=line_number,
-                        line_content=str(row),
-                    ) from e
+                    continue
 
         logger.info(f"Completed parsing of {self.csv_path}")
 
@@ -118,9 +128,11 @@ class CSVParser:
         logger.debug(f"Validated header: {normalized_header}")
         return normalized_header
 
-    def _parse_row(self, row: list[str], header: list[str], line_number: int) -> User:
+    def _parse_row(
+        self, row: list[str], header: list[str], line_number: int
+    ) -> Optional[RawUserData]:
         """
-        Parse a single CSV row into a User object.
+        Parse a single CSV row into raw data.
 
         Args:
             row: List of cell values.
@@ -128,18 +140,27 @@ class CSVParser:
             line_number: Current line number for error reporting.
 
         Returns:
-            User: Parsed user object.
+            RawUserData or None if row is invalid.
 
         Raises:
             CSVFormatError: If row format is invalid.
-            ValidationError: If data validation fails.
         """
-        if len(row) != len(header):
-            raise CSVFormatError(
-                f"Row has {len(row)} columns, expected {len(header)}",
-                line_number=line_number,
-                line_content=str(row),
+        # Check if row has correct number of columns
+        if len(row) < len(header):
+            # Row has fewer columns than header
+            logger.warning(
+                f"Line {line_number}: Row has {len(row)} columns, expected at least {len(header)}. "
+                f"Filling missing columns with empty strings."
             )
+            # Pad row with empty strings
+            row = row + [""] * (len(header) - len(row))
+        elif len(row) > len(header):
+            # Row has extra columns, we can ignore them
+            logger.warning(
+                f"Line {line_number}: Row has {len(row)} columns, header has {len(header)}. "
+                f"Ignoring extra columns."
+            )
+            row = row[: len(header)]
 
         # Create dictionary from row data
         row_dict = {}
@@ -149,25 +170,17 @@ class CSVParser:
             else:
                 row_dict[field] = ""
 
-        # Validate required fields are not empty
+        # Check for completely empty required fields
         for field in self.REQUIRED_FIELDS:
-            if not row_dict.get(field):
-                raise ValidationError(
-                    field=field,
-                    value=row_dict.get(field, ""),
-                    message=f"Required field '{field}' is empty",
-                )
+            value = row_dict.get(field, "")
+            if not value:
+                logger.warning(f"Line {line_number}: Required field '{field}' is empty")
+                # We'll still return the data and let validator handle it
 
-        try:
-            user = User(
-                user_id=row_dict["user_id"],
-                name=row_dict["name"],
-                email=row_dict["email"],
-            )
-            return user
-        except ValueError as e:
-            raise ValidationError(
-                field="user_data",
-                value=str(row_dict),
-                message=f"Invalid user data: {e}",
-            )
+        # Return raw data - no validation here!
+        return RawUserData(
+            user_id=row_dict.get("user_id", ""),
+            name=row_dict.get("name", ""),
+            email=row_dict.get("email", ""),
+            line_number=line_number,
+        )
