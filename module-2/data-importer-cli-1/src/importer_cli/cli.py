@@ -24,7 +24,7 @@ log_dir.mkdir(exist_ok=True, parents=True)
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler(log_dir / "importer.log"),
@@ -59,61 +59,53 @@ class ResilientImporter:
         logger.info(f"Initialized importer for {csv_path}")
 
     def import_users(self) -> ImportResult:
-        """
-        Import users from CSV file.
-
-        Returns:
-            ImportResult: Results of the import operation.
-        """
         logger.info(f"Starting import from {self.csv_path}")
 
         try:
-            for user in self.parser.parse():
+            for line_num, user_data in enumerate(self.parser.parse(), start=1):
                 self.result.total_processed += 1
 
                 try:
-                    # Validate user
-                    self.validator.validate(user)
+                    # Validate row
+                    self.validator.validate(user_data)
 
-                    # Sanitize user data
+                    # Sanitize
                     user = User(
-                        user_id=self.validator.sanitize_user_id(user.user_id),
-                        name=self.validator.sanitize_name(user.name),
-                        email=self.validator.sanitize_email(user.email),
+                        user_id=self.validator.sanitize_user_id(user_data.user_id),
+                        name=self.validator.sanitize_name(user_data.name),
+                        email=self.validator.sanitize_email(user_data.email),
                     )
 
-                    # Save to repository
+                    # Save
                     try:
                         self.repository.save(user)
                         self.result.add_success()
                         logger.info(f"Successfully imported user: {user.user_id}")
+
                     except DuplicateUserError as de:
-                        # Count duplicates without raising
                         self.result.duplicates_skipped += 1
-                        self.result.add_error(self.result.total_processed, str(de))
+                        self.result.add_error(line_num, str(de))
                         logger.warning(f"Duplicate user skipped: {de}")
 
-                except ImporterError as e:
-                    # Handle validation or parser row-level errors
+                except ImporterError as ie:
+                    # Validation issues
                     self.result.failed += 1
-                    self.result.add_error(self.result.total_processed, str(e))
-                    logger.error(f"Failed to import user: {e}")
+                    self.result.add_error(line_num, str(ie))
+                    logger.error(f"Failed to import user: {ie}")
 
                 except Exception as e:
-                    # Catch unexpected errors per row
+                    # Unexpected row-level errors
                     self.result.failed += 1
-                    error_msg = f"Unexpected import error: {e}"
-                    self.result.add_error(self.result.total_processed, error_msg)
-                    logger.error(error_msg)
+                    self.result.add_error(line_num, f"Unexpected error: {e}")
+                    logger.error(f"Unexpected error importing row: {e}")
 
         except MissingFileError as mfe:
-            # CSV file missing
             logger.error(f"File not found: {self.csv_path}")
             self.result.failed += 1
             self.result.add_error(0, str(mfe))
 
         except Exception as e:
-            # Any other top-level errors
+            # Parser-level fatal errors ONLY
             error_msg = f"Unexpected error during import: {e}"
             logger.error(error_msg)
             self.result.failed += 1
