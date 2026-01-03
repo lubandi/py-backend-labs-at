@@ -4,8 +4,8 @@ Tests for user validator.
 
 import pytest
 
-from src.importer_cli.models.models import User
-from src.importer_cli.validator.validator import UserValidator
+from importer_cli.models.models import User
+from importer_cli.validator.validator import UserValidator
 
 
 class TestUserValidator:
@@ -32,23 +32,15 @@ class TestUserValidator:
         """Test email validation using parametrize."""
         validator = UserValidator()
 
-        # Skip tests that would fail during User creation
-        # (because User validates email in __post_init__)
-        if (
-            email == ""
-            or email is None
-            or email == "invalid-email"
-            or email == "@example.com"
-            or email == "test@"
-        ):
-            # These would fail User creation, so skip testing via validator
-            # The User model already validates these at creation time
-            return
-
-        # For valid emails, test they pass validation
-        user = User(user_id="123", name="Test User", email=email)
-        result = validator.validate(user)
-        assert result is True
+        # For valid emails, create a User and test validation
+        if expected_valid:
+            user = User(user_id="123", name="Test User", email=email)
+            result = validator.validate_user(user)
+            assert result is True
+        else:
+            # For invalid emails, test _validate_email directly
+            result = validator._validate_email(email)
+            assert result is False
 
     @pytest.mark.parametrize(
         "user_id,name,email,should_pass",
@@ -66,20 +58,34 @@ class TestUserValidator:
         """Test user validation with parametrize."""
         validator = UserValidator()
 
-        # Skip tests that would fail during User creation
-        if not user_id or not name or not email or "@" not in email:
-            # User model would reject these at creation
-            # So we can't test validator on invalid User objects
-            return
-
-        # Only test with valid User objects
-        user = User(user_id=user_id, name=name, email=email)
-
+        # Only create User objects for cases that would pass User model validation
         if should_pass:
-            assert validator.validate(user) is True
+            user = User(user_id=user_id, name=name, email=email)
+            assert validator.validate_user(user) is True
         else:
-            # For this test, all should_pass=True since we filtered invalid ones
-            pass
+            # For invalid cases, test validate_raw_data instead
+            user_data = {"user_id": user_id, "name": name, "email": email}
+
+            with pytest.raises(Exception):
+                validator.validate_raw_data(user_data)
+
+    def test_validate_raw_data_valid(self) -> None:
+        """Test validate_raw_data with valid data."""
+        validator = UserValidator()
+
+        user_data = {"user_id": "123", "name": "John Doe", "email": "john@example.com"}
+
+        result = validator.validate_raw_data(user_data)
+        assert result is True
+
+    def test_validate_raw_data_invalid(self) -> None:
+        """Test validate_raw_data with invalid data."""
+        validator = UserValidator()
+
+        user_data = {"user_id": "", "name": "John Doe", "email": "john@example.com"}
+
+        with pytest.raises(Exception):
+            validator.validate_raw_data(user_data)
 
     @pytest.mark.parametrize(
         "input_name,expected_output",
@@ -118,4 +124,4 @@ class TestUserValidator:
         user = User(user_id="test123", name="John Doe", email="test@example.com")
 
         # Should pass validation
-        assert validator.validate(user) is True
+        assert validator.validate_user(user) is True

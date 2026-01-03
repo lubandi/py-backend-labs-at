@@ -101,3 +101,82 @@
 2026-01-02 21:46:23,573 - __main__ - ERROR - File not found: Downloads\test_reader.csv
 2026-01-02 21:47:19,944 - importer_cli.parser.parser - ERROR - Error at line 2: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
 2026-01-02 21:47:19,945 - __main__ - ERROR - Unexpected error during import: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:37:29,004 - importer_cli.parser.parser - ERROR - Error at line 2: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:37:29,004 - src.importer_cli.cli - ERROR - Unexpected error during import: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:38:12,135 - importer_cli.parser.parser - ERROR - Error at line 2: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:38:12,135 - src.importer_cli.cli - ERROR - Unexpected error during import: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:39:23,473 - importer_cli.parser.parser - ERROR - Error at line 2: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:39:23,473 - src.importer_cli.cli - ERROR - Unexpected error during import: Invalid user data: email must contain '@': user_data={'user_id': '10', 'name': 'A', 'email': 'wwexample.com'}
+2026-01-03 09:56:33,710 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 09:56:33,710 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 09:56:33,710 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 09:56:33,712 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 09:56:33,712 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 09:56:33,712 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 09:56:33,713 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:00:22,838 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 10:00:22,838 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 10:00:22,838 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 10:00:22,839 - importer_cli.repository.repository - WARNING - Duplicate user found: 31
+2026-01-03 10:00:22,839 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=31
+2026-01-03 10:00:22,839 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 10:00:22,840 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 10:00:22,840 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 10:00:22,840 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:00:22,840 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
+2026-01-03 10:00:22,841 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
+2026-01-03 10:07:33,173 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 10:07:33,173 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 10:07:33,174 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 10:07:33,174 - importer_cli.repository.repository - WARNING - Duplicate user found: 31
+2026-01-03 10:07:33,174 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=31
+2026-01-03 10:07:33,175 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 10:07:33,175 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 10:07:33,175 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 10:07:33,175 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:07:33,176 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
+2026-01-03 10:07:33,176 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
+2026-01-03 10:07:43,006 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 10:07:43,007 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 10:07:43,007 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 10:07:43,008 - importer_cli.repository.repository - WARNING - Duplicate user found: 31
+2026-01-03 10:07:43,008 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=31
+2026-01-03 10:07:43,008 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 10:07:43,008 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 10:07:43,009 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 10:07:43,009 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:07:43,009 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
+2026-01-03 10:07:43,009 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
+2026-01-03 10:07:54,338 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 10:07:54,339 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 10:07:54,339 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 10:07:54,339 - importer_cli.repository.repository - WARNING - Duplicate user found: 31
+2026-01-03 10:07:54,340 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=31
+2026-01-03 10:07:54,340 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 10:07:54,340 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 10:07:54,340 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 10:07:54,340 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:07:54,341 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
+2026-01-03 10:07:54,341 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
+2026-01-03 10:10:53,886 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 10:10:53,887 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 10:10:53,887 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 10:10:53,888 - importer_cli.repository.repository - WARNING - Duplicate user found: 31
+2026-01-03 10:10:53,888 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=31
+2026-01-03 10:10:53,888 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 10:10:53,888 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 10:10:53,889 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 10:10:53,889 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:10:53,889 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
+2026-01-03 10:10:53,890 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
+2026-01-03 10:13:55,385 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=wwexample.com
+2026-01-03 10:13:55,386 - importer_cli.parser.parser - WARNING - Line 3: Required field 'name' is empty
+2026-01-03 10:13:55,386 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Name cannot be empty: name=
+2026-01-03 10:13:55,386 - importer_cli.repository.repository - WARNING - Duplicate user found: 31
+2026-01-03 10:13:55,387 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=31
+2026-01-03 10:13:55,387 - importer_cli.parser.parser - WARNING - Line 5: Required field 'name' is empty
+2026-01-03 10:13:55,387 - src.importer_cli.cli - ERROR - Failed to import user at line 5: Name cannot be empty: name=
+2026-01-03 10:13:55,387 - importer_cli.parser.parser - WARNING - Line 6: Required field 'email' is empty
+2026-01-03 10:13:55,387 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
+2026-01-03 10:13:55,388 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
+2026-01-03 10:13:55,388 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71

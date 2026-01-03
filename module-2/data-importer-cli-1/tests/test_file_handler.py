@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from src.importer_cli.context_manager.file_handler import CSVFileReader
-from src.importer_cli.exceptions.exceptions import MissingFileError
+from importer_cli.context_manager.file_handler import CSVFileReader
+from importer_cli.exceptions.exceptions import MissingFileError
 
 
 class TestCSVFileReader:

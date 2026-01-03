@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from src.importer_cli.cli import ResilientImporter
-from src.importer_cli.models.models import ImportResult
+from importer_cli.cli import ResilientImporter
+from importer_cli.models.models import ImportResult
 
 
 class TestIntegration:
@@ -76,7 +76,9 @@ class TestIntegration:
         assert result.successful == 1  # Only first valid row
         assert result.failed == 3  # 3 validation errors
         assert result.duplicates_skipped == 1  # 1 duplicate
-        assert len(result.errors) == 3  # Error messages for failed rows
+        assert (
+            len(result.errors) == 4
+        )  # Changed from 3 to 4 (3 validation + 1 duplicate)
 
     def test_import_with_missing_csv_file(self, tmp_path: Path) -> None:
         """Test import when CSV file doesn't exist."""

@@ -59,21 +59,32 @@ class ResilientImporter:
         logger.info(f"Initialized importer for {csv_path}")
 
     def import_users(self) -> ImportResult:
+        # Reset for new import
+        self.result = ImportResult()
+
         logger.info(f"Starting import from {self.csv_path}")
 
         try:
-            for line_num, user_data in enumerate(self.parser.parse(), start=1):
+            for raw_user_data in self.parser.parse():
+                line_num = raw_user_data.line_number
                 self.result.total_processed += 1
 
                 try:
+                    # Convert RawUserData to dict for validator
+                    user_data_dict = {
+                        "user_id": raw_user_data.user_id,
+                        "name": raw_user_data.name,
+                        "email": raw_user_data.email,
+                    }
+
                     # Validate row
-                    self.validator.validate(user_data)
+                    self.validator.validate_raw_data(user_data_dict)
 
                     # Sanitize
                     user = User(
-                        user_id=self.validator.sanitize_user_id(user_data.user_id),
-                        name=self.validator.sanitize_name(user_data.name),
-                        email=self.validator.sanitize_email(user_data.email),
+                        user_id=self.validator.sanitize_user_id(raw_user_data.user_id),
+                        name=self.validator.sanitize_name(raw_user_data.name),
+                        email=self.validator.sanitize_email(raw_user_data.email),
                     )
 
                     # Save
@@ -84,31 +95,31 @@ class ResilientImporter:
 
                     except DuplicateUserError as de:
                         self.result.duplicates_skipped += 1
-                        self.result.add_error(line_num, str(de))
+                        # Add to errors list but don't increment failed
+                        self.result.errors.append((line_num, str(de)))
                         logger.warning(f"Duplicate user skipped: {de}")
 
                 except ImporterError as ie:
-                    # Validation issues
-                    self.result.failed += 1
+                    # Validation issues - add_error() will increment failed
                     self.result.add_error(line_num, str(ie))
-                    logger.error(f"Failed to import user: {ie}")
+                    logger.error(f"Failed to import user at line {line_num}: {ie}")
 
                 except Exception as e:
-                    # Unexpected row-level errors
-                    self.result.failed += 1
+                    # Unexpected row-level errors - add_error() will increment failed
                     self.result.add_error(line_num, f"Unexpected error: {e}")
-                    logger.error(f"Unexpected error importing row: {e}")
+                    logger.error(
+                        f"Unexpected error importing row at line {line_num}: {e}"
+                    )
 
         except MissingFileError as mfe:
             logger.error(f"File not found: {self.csv_path}")
-            self.result.failed += 1
+            # add_error() will increment failed
             self.result.add_error(0, str(mfe))
 
         except Exception as e:
-            # Parser-level fatal errors ONLY
+            # Parser-level fatal errors ONLY - add_error() will increment failed
             error_msg = f"Unexpected error during import: {e}"
             logger.error(error_msg)
-            self.result.failed += 1
             self.result.add_error(0, error_msg)
 
         logger.info(f"Import completed: {self.result}")

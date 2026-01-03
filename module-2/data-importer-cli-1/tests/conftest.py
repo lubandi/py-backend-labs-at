@@ -11,8 +11,8 @@ from typing import Generator
 
 import pytest
 
-from src.importer_cli.models.models import User
-from src.importer_cli.repository.repository import UserRepository
+from importer_cli.models.models import User
+from importer_cli.repository.repository import UserRepository
 
 
 @pytest.fixture

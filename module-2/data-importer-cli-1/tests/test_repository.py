@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from src.importer_cli.exceptions.exceptions import DuplicateUserError
-from src.importer_cli.models.models import User
-from src.importer_cli.repository.repository import UserRepository
+from importer_cli.exceptions.exceptions import DuplicateUserError
+from importer_cli.models.models import User
+from importer_cli.repository.repository import UserRepository
 
 
 class TestUserRepository:

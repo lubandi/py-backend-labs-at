@@ -4,7 +4,7 @@ We test that our custom exceptions work properly and include the right informati
 """
 
 
-from src.importer_cli.exceptions.exceptions import CSVFormatError, ImporterError
+from importer_cli.exceptions.exceptions import CSVFormatError, ImporterError
 
 
 class TestExceptions:

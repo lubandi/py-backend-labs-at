@@ -4,11 +4,6 @@
     "name": "John",
     "email": "john@example.com"
   },
-  "2": {
-    "user_id": "2",
-    "name": "B",
-    "email": "ff@example.com"
-  },
   "31": {
     "user_id": "31",
     "name": "C",

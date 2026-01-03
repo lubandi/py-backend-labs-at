@@ -5,7 +5,7 @@ These tests verify that our User and ImportResult classes work correctly.
 
 import pytest
 
-from src.importer_cli.models.models import ImportResult, User
+from importer_cli.models.models import ImportResult, User
 
 
 class TestUser:
