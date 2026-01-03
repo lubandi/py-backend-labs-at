@@ -41,3 +41,30 @@ class TestWeatherService:
         # Act & Assert
         with pytest.raises(InvalidAPIKeyError):
             service.get_forecast(city)
+
+    def test_logging_on_success(self, mocker):
+        """Test that logging occurs on successful forecast retrieval"""
+        # Arrange
+        mock_logger = mocker.Mock()
+        service = WeatherService()
+        service.logger = mock_logger
+
+        # Act
+        service.get_forecast("London")
+
+        # Assert
+        assert mock_logger.info.call_count >= 2
+
+    def test_logging_on_error(self, mocker):
+        """Test that logging occurs on error"""
+        # Arrange
+        mock_logger = mocker.Mock()
+        service = WeatherService(api_key="invalid")
+        service.logger = mock_logger
+
+        # Act & Assert
+        with pytest.raises(InvalidAPIKeyError):
+            service.get_forecast("London")
+
+        # Verify error was logged
+        mock_logger.error.assert_called_once()
