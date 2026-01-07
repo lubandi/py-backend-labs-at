@@ -24,23 +24,23 @@ class TestUser:
         """
         Test that valid data passes validation.
         The _validate() method is called during __init__.
+        If no exception is raised, the test passes
         """
         user = User(user_id="123", name="John Doe", email="john@example.com")
-        # If no exception is raised, the test passes
-        user._validate()  # Should not raise any exception
+        user._validate()
 
     @pytest.mark.parametrize(
         "user_id,name,email,expected_error",
         [
-            # Test Case 1: Empty user_id
+            # Empty user_id
             ("", "John Doe", "john@example.com", "user_id must be a non-empty string"),
-            # Test Case 2: Empty name
+            # Empty name
             ("123", "", "john@example.com", "name must be a non-empty string"),
-            # Test Case 3: Empty email
+            # Empty email
             ("123", "John Doe", "", "email must be a non-empty string"),
-            # Test Case 4: Invalid email format
+            # Invalid email format
             ("123", "John Doe", "invalid", "email must contain '@'"),
-            # Test Case 5: None values
+            # None values
             (
                 None,
                 "John Doe",
@@ -73,7 +73,7 @@ class TestImportResult:
         assert result.successful == 0
         assert result.failed == 0
         assert result.duplicates_skipped == 0
-        assert result.errors == []  # Empty list
+        assert result.errors == []
 
     def test_add_error(self) -> None:
         """Test adding an error to the result."""

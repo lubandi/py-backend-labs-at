@@ -95,17 +95,14 @@ class ResilientImporter:
 
                     except DuplicateUserError as de:
                         self.result.duplicates_skipped += 1
-                        # Add to errors list but don't increment failed
                         self.result.errors.append((line_num, str(de)))
                         logger.warning(f"Duplicate user skipped: {de}")
 
                 except ImporterError as ie:
-                    # Validation issues - add_error() will increment failed
                     self.result.add_error(line_num, str(ie))
                     logger.error(f"Failed to import user at line {line_num}: {ie}")
 
                 except Exception as e:
-                    # Unexpected row-level errors - add_error() will increment failed
                     self.result.add_error(line_num, f"Unexpected error: {e}")
                     logger.error(
                         f"Unexpected error importing row at line {line_num}: {e}"
@@ -113,11 +110,9 @@ class ResilientImporter:
 
         except MissingFileError as mfe:
             logger.error(f"File not found: {self.csv_path}")
-            # add_error() will increment failed
             self.result.add_error(0, str(mfe))
 
         except Exception as e:
-            # Parser-level fatal errors ONLY - add_error() will increment failed
             error_msg = f"Unexpected error during import: {e}"
             logger.error(error_msg)
             self.result.add_error(0, error_msg)
@@ -141,7 +136,7 @@ def import_csv_command(args):
     if result.duplicates_skipped > 0:
         print(f"⚠️  Skipped {result.duplicates_skipped} duplicate users.")
 
-    # Optional: detailed errors
+    # detailed errors
     if result.errors:
         print("Errors encountered:")
         for line_num, error in result.errors:

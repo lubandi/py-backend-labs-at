@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class UserValidator:
     """Validator for user data."""
 
-    # Email validation regex (simplified)
+    # Email validation regex
     EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 
     def __init__(self) -> None:

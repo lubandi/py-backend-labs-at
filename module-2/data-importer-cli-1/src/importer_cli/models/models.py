@@ -8,6 +8,16 @@ from dataclasses import dataclass
 
 
 @dataclass
+class RawUserData:
+    """Container for raw, unvalidated user data from CSV."""
+
+    user_id: str
+    name: str
+    email: str
+    line_number: int
+
+
+@dataclass
 class User:
     """Represents a user with unique identifier and contact information."""
 
