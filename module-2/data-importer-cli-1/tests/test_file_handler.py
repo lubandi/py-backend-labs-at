@@ -19,17 +19,10 @@ class TestCSVFileReader:
         with CSVFileReader(temp_csv_file) as reader:
             rows = list(reader)
 
-            # Filter out empty rows
-            non_empty_rows = [row for row in rows if row]  # Remove empty lists
-
-            # Now we should have 4 rows: header + 3 data rows
-            assert len(non_empty_rows) == 4
-
-            # Check the content
-            assert non_empty_rows[0] == ["user_id", "name", "email"]
-            assert non_empty_rows[1] == ["1", "John Doe", "john@example.com"]
-            assert non_empty_rows[2] == ["2", "Jane Smith", "jane@example.com"]
-            assert non_empty_rows[3] == ["3", "Bob Johnson", "bob@example.com"]
+            assert rows[0] == ["user_id", "name", "email"]
+            assert rows[1] == ["1", "John Doe", "john@example.com"]
+            assert rows[2] == ["2", "Jane Smith", "jane@example.com"]
+            assert rows[3] == ["3", "Bob Johnson", "bob@example.com"]
 
     def test_csv_file_reader_missing_file(self, tmp_path: Path) -> None:
         """

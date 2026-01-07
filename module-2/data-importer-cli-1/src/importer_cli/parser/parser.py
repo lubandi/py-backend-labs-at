@@ -5,24 +5,14 @@ This module handles CSV parsing with robust error handling.
 """
 
 import logging
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional
 
 from importer_cli.context_manager.file_handler import CSVFileReader
 from importer_cli.exceptions.exceptions import CSVFormatError
+from importer_cli.models.models import RawUserData
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class RawUserData:
-    """Container for raw, unvalidated user data from CSV."""
-
-    user_id: str
-    name: str
-    email: str
-    line_number: int
 
 
 class CSVParser:
@@ -63,7 +53,6 @@ class CSVParser:
                 first_row = None
 
             if first_row is None:
-                # File is empty
                 raise CSVFormatError("CSV file is empty", line_number=1)
 
             # Validate header immediately

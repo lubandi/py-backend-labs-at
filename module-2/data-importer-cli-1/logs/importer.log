@@ -180,3 +180,5 @@
 2026-01-03 10:13:55,387 - src.importer_cli.cli - ERROR - Failed to import user at line 6: Invalid email format: email=
 2026-01-03 10:13:55,388 - importer_cli.repository.repository - WARNING - Duplicate user found: 71
 2026-01-03 10:13:55,388 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
+2026-01-07 10:29:06,842 - importer_cli.context_manager.file_handler - ERROR - File not found: users.csv
+2026-01-07 10:29:06,843 - __main__ - ERROR - File not found: users.csv

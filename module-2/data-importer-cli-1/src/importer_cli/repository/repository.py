@@ -49,7 +49,7 @@ class UserRepository:
                     )
                     return {}
                 return data
-        except (FileNotFoundError, MissingFileError):  # CATCH BOTH!
+        except (FileNotFoundError, MissingFileError):
             logger.info(f"Database file {self.db_path} not found, creating new")
             return {}
         except Exception as e:
@@ -67,9 +67,7 @@ class UserRepository:
             # Create the handler object
             handler = JSONFileHandler(self.db_path, mode="w")
 
-            # Enter the context manager
             with handler:
-                # Call write_data on the handler object
                 handler.write_data(data)
 
             logger.debug(f"Database saved to {self.db_path}")
