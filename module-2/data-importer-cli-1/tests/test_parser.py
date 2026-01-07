@@ -34,7 +34,7 @@ class TestCSVParser:
 
     def test_parse_empty_csv(self, tmp_path: Path) -> None:
         csv_file = tmp_path / "empty.csv"
-        csv_file.write_text("")  # completely empty file
+        csv_file.write_text("")
 
         parser = CSVParser(csv_file)
         with pytest.raises(CSVFormatError, match="CSV file is empty"):

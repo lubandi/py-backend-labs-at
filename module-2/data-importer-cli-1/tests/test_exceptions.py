@@ -26,8 +26,8 @@ class TestExceptions:
         # Check error message includes all relevant info
         error_message = str(error)
         assert "CSV error" in error_message
-        assert "line 5" in error_message  # Line number should be mentioned
-        assert "bad,row,data" in error_message  # Problematic content
+        assert "line 5" in error_message
+        assert "bad,row,data" in error_message
 
         # Check attributes are stored
         assert error.line_number == 5
