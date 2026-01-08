@@ -1,0 +1,54 @@
+{
+    "summary": {
+        "mean": 84.4,
+        "median": 86.5,
+        "mode": 95.5
+    },
+    "grade_distribution": {
+        "A": 4,
+        "B": 3,
+        "C": 2,
+        "D": 1
+    },
+    "top_performers": [
+        {
+            "name": "Alice Brown",
+            "gpa": 98.0,
+            "major": "CS"
+        },
+        {
+            "name": "John Doe",
+            "gpa": 91.5,
+            "major": "CS"
+        },
+        {
+            "name": "Jane Smith",
+            "gpa": 83.75,
+            "major": "ENG"
+        },
+        {
+            "name": "Charlie Davis",
+            "gpa": 78.5,
+            "major": "MATH"
+        },
+        {
+            "name": "Bob Johnson",
+            "gpa": 73.5,
+            "major": "PHYS"
+        }
+    ],
+    "major_counts": {
+        "CS": 2,
+        "ENG": 1,
+        "PHYS": 1,
+        "MATH": 1
+    },
+    "courses_analyzed": 7,
+    "departments": [
+        "MAT",
+        "HIS",
+        "ENG",
+        "PHY",
+        "CS1"
+    ]
+}

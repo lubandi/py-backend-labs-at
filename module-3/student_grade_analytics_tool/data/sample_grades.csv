@@ -1,0 +1,11 @@
+student_id,first_name,last_name,major,year,course_id,course_name,credits,semester,score
+S001,John,Doe,CS,2023,CS101,Intro into CS,3,Fall 2023,95.5
+S001,John,Doe,CS,2023,MATH101,Calculus I,4,Fall 2023,88.0
+S002,Jane,Smith,ENG,2024,ENG101,English Comp,3,Fall 2023,92.0
+S002,Jane,Smith,ENG,2024,HIST101,World History,3,Fall 2023,75.5
+S003,Bob,Johnson,PHYS,2023,PHYS101,Physics I,4,Fall 2023,82.0
+S003,Bob,Johnson,PHYS,2023,CS101,Intro into CS,3,Fall 2023,65.0
+S004,Alice,Brown,CS,2025,CS102,Data Structures,4,Spring 2024,98.0
+S005,Charlie,Davis,MATH,2022,MATH201,Calculus II,4,Spring 2024,72.0
+S005,Charlie,Davis,MATH,2022,CS101,Intro into CS,3,Spring 2024,85.0
+S001,John,Doe,CS,2023,CS102,Data Structures,4,Spring 2024,91.0
