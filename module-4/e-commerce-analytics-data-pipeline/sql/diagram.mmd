@@ -1,0 +1,29 @@
+erDiagram
+    CUSTOMERS ||--o{ ORDERS : places
+    ORDERS ||--|{ ORDER_ITEMS : contains
+    PRODUCTS ||--o{ ORDER_ITEMS : "is in"
+
+    CUSTOMERS {
+        int customer_id PK
+        string name
+        string email
+    }
+    PRODUCTS {
+        int product_id PK
+        string name
+        decimal price
+        int stock_quantity
+        jsonb metadata
+    }
+    ORDERS {
+        int order_id PK
+        int customer_id FK
+        timestamp order_date
+        decimal total_amount
+    }
+    ORDER_ITEMS {
+        int item_id PK
+        int order_id FK
+        int product_id FK
+        int quantity
+    }
