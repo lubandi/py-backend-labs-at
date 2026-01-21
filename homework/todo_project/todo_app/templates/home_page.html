@@ -1,0 +1,24 @@
+{% extends "base_page.html" %}
+
+{% block title %}<title>Home</title>{% endblock %}
+
+{% block content %}
+<h1>Todo List</h1>
+
+<a href="{% url 'create_todo' %}">+ New Todo</a>
+
+<ul>
+    {% for todo in todos %}
+    <li>
+        {% if todo.completed %}
+        <s>{{ todo.title }}</s>
+        {% else %}
+        {{ todo.title }}
+        {% endif %}
+        - <a href="{% url 'single_todo_page' todo.pk %}">View</a>
+    </li>
+    {% empty %}
+    <li>No todos yet</li>
+    {% endfor %}
+</ul>
+{% endblock %}

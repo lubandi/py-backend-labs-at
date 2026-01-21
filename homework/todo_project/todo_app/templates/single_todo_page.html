@@ -1,0 +1,30 @@
+{% extends "base_page.html" %}
+
+{% block title %}<title>Todo Details</title>{% endblock %}
+
+{% block content %}
+<a href="{% url 'home' %}">Back to List</a>
+
+<h1>{{ todo.title }}</h1>
+<p>{{ todo.details }}</p>
+<p>Status:
+    {% if todo.completed %}
+    Completed
+    {% else %}
+    Pending
+    {% endif %}
+</p>
+
+
+<h3>Edit Todo</h3>
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="title" value="{{ todo.title }}">
+    <input type="text" name="details" value="{{ todo.details }}">
+    <button type="submit" name="edit">Save Changes</button>
+    {% if not todo.completed %}
+    <button type="submit" name="complete">Mark as Complete</button>
+    {% endif %}
+    <button type="submit" name="delete" onclick="return confirm('Are you sure?')">Delete</button>
+</form>
+{% endblock %}

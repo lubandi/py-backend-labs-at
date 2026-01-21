@@ -1,0 +1,16 @@
+{% extends "base_page.html" %}
+
+{% block title %}<title>Create Todo</title>{% endblock %}
+
+{% block content %}
+<h1>Create Todo</h1>
+
+<a href="{% url 'home' %}">Back to List</a>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Title" required>
+    <input type="text" name="details" placeholder="Details">
+    <input type="submit" value="Create">
+</form>
+{% endblock %}
