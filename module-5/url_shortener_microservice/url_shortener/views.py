@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,6 +13,18 @@ class ShortenViewSet(viewsets.ViewSet):
     ViewSet for creating short URLs.
     """
 
+    @extend_schema(
+        request=ShortURLCreateSerializer,
+        responses={201: ShortURLResponseSerializer},
+        description="Submit a long URL to generate a short code.",
+        examples=[
+            OpenApiExample(
+                "Correct Input",
+                value={"url": "https://www.example.com"},
+                request_only=True,
+            ),
+        ],
+    )
     def create(self, request):
         serializer = ShortURLCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -30,6 +43,18 @@ class RedirectView(APIView):
     Redirect to the original URL.
     """
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="short_code",
+                location=OpenApiParameter.PATH,
+                description="The short code to redirect",
+                type=str,
+            )
+        ],
+        responses={302: None, 404: None},
+        description="Redirects to the original URL based on the short code.",
+    )
     def get(self, request, short_code):
         original_url = UrlShortenerService.get_original_url(short_code)
         if original_url:
@@ -44,6 +69,10 @@ class AnalyticsViewSet(viewsets.ViewSet):
     ViewSet for retrieving analytics.
     """
 
+    @extend_schema(
+        responses={200: ShortURLResponseSerializer},
+        description="Get statistics for a specific short code.",
+    )
     def retrieve(self, request, short_code=None):
         instance = UrlShortenerService.get_stats(short_code)
         if instance:
