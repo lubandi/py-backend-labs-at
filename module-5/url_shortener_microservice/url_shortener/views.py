@@ -44,9 +44,8 @@ class AnalyticsViewSet(viewsets.ViewSet):
     ViewSet for retrieving analytics.
     """
 
-    def retrieve(self, request, pk=None):
-        # 'pk' here is the short_code
-        instance = UrlShortenerService.get_stats(pk)
+    def retrieve(self, request, short_code=None):
+        instance = UrlShortenerService.get_stats(short_code)
         if instance:
             serializer = ShortURLResponseSerializer(
                 instance, context={"request": request}
