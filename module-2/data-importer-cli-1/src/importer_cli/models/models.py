@@ -25,21 +25,6 @@ class User:
     name: str
     email: str
 
-    def __post_init__(self) -> None:
-        """Validate the user data after initialization."""
-        self._validate()
-
-    def _validate(self) -> None:
-        """Validate user fields."""
-        if not self.user_id or not isinstance(self.user_id, str):
-            raise ValueError("user_id must be a non-empty string")
-        if not self.name or not isinstance(self.name, str):
-            raise ValueError("name must be a non-empty string")
-        if not self.email or not isinstance(self.email, str):
-            raise ValueError("email must be a non-empty string")
-        if "@" not in self.email:
-            raise ValueError("email must contain '@'")
-
     def to_dict(self) -> dict[str, str]:
         """Convert User object to dictionary."""
         return {

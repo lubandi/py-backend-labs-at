@@ -3,8 +3,6 @@ Tests for data models.
 These tests verify that our User and ImportResult classes work correctly.
 """
 
-import pytest
-
 from importer_cli.models.models import ImportResult, User
 
 
@@ -19,48 +17,6 @@ class TestUser:
         assert user.user_id == "123"
         assert user.name == "John Doe"
         assert user.email == "john@example.com"
-
-    def test_user_validation_valid(self) -> None:
-        """
-        Test that valid data passes validation.
-        The _validate() method is called during __init__.
-        If no exception is raised, the test passes
-        """
-        user = User(user_id="123", name="John Doe", email="john@example.com")
-        user._validate()
-
-    @pytest.mark.parametrize(
-        "user_id,name,email,expected_error",
-        [
-            # Empty user_id
-            ("", "John Doe", "john@example.com", "user_id must be a non-empty string"),
-            # Empty name
-            ("123", "", "john@example.com", "name must be a non-empty string"),
-            # Empty email
-            ("123", "John Doe", "", "email must be a non-empty string"),
-            # Invalid email format
-            ("123", "John Doe", "invalid", "email must contain '@'"),
-            # None values
-            (
-                None,
-                "John Doe",
-                "john@example.com",
-                "user_id must be a non-empty string",
-            ),
-        ],
-    )
-    def test_user_validation_invalid(
-        self, user_id: str, name: str, email: str, expected_error: str
-    ) -> None:
-        """
-        Test validation with various invalid inputs.
-
-        @pytest.mark.parametrize runs this test multiple times with different data.
-        This is more efficient than writing separate test functions!
-        """
-        with pytest.raises(ValueError, match=expected_error):
-            # Creating a User with invalid data should raise ValueError
-            User(user_id=user_id, name=name, email=email)
 
 
 class TestImportResult:

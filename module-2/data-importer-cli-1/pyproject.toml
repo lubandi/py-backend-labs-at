@@ -30,5 +30,7 @@ ignore = ["E501"]
 
 [dependency-groups]
 dev = [
-    "autopep8 (>=2.3.2,<3.0.0)"
+    "autopep8 (>=2.3.2,<3.0.0)",
+    "pytest>=7.0.0,<8.0.0",
+    "pytest-cov>=4.1.0,<5.0.0"
 ]

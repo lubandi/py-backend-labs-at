@@ -182,3 +182,13 @@
 2026-01-03 10:13:55,388 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=71
 2026-01-07 10:29:06,842 - importer_cli.context_manager.file_handler - ERROR - File not found: users.csv
 2026-01-07 10:29:06,843 - __main__ - ERROR - File not found: users.csv
+2026-02-04 11:26:20,688 - importer_cli.context_manager.file_handler - ERROR - File not found: c\Downloads\test_reader66.csv
+2026-02-04 11:26:20,696 - src.importer_cli.cli - ERROR - File not found: c\Downloads\test_reader66.csv
+2026-02-04 11:26:40,723 - importer_cli.context_manager.file_handler - ERROR - File not found: Downloads\test_reader66.csv
+2026-02-04 11:26:40,723 - src.importer_cli.cli - ERROR - File not found: Downloads\test_reader66.csv
+2026-02-04 11:27:25,255 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=ww
+2026-02-04 11:27:25,256 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Invalid email format: email=ff
+2026-02-04 11:27:25,256 - src.importer_cli.cli - ERROR - Failed to import user at line 4: Invalid email format: email=uu
+2026-02-04 11:28:15,590 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=ww
+2026-02-04 11:28:15,590 - importer_cli.parser.parser - WARNING - Line 3: Required field 'email' is empty
+2026-02-04 11:28:15,591 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Invalid email format: email=

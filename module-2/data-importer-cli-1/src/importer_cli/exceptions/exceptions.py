@@ -80,4 +80,6 @@ class ValidationError(ImporterError):
 class DatabaseError(ImporterError):
     """Base exception for database-related errors."""
 
-    pass
+    def __init__(self, message: str = "A database error occurred") -> None:
+        super().__init__(message)
+        self.message = message
