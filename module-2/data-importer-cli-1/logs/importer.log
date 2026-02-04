@@ -192,3 +192,13 @@
 2026-02-04 11:28:15,590 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=ww
 2026-02-04 11:28:15,590 - importer_cli.parser.parser - WARNING - Line 3: Required field 'email' is empty
 2026-02-04 11:28:15,591 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Invalid email format: email=
+2026-02-04 14:56:21,353 - src.importer_cli.cli - ERROR - Failed to import user at line 2: Invalid email format: email=ww
+2026-02-04 14:56:21,353 - importer_cli.parser.parser - WARNING - Line 3: Required field 'email' is empty
+2026-02-04 14:56:21,353 - src.importer_cli.cli - ERROR - Failed to import user at line 3: Invalid email format: email=
+2026-02-04 14:56:21,354 - importer_cli.repository.repository - WARNING - Duplicate user found: 3
+2026-02-04 14:56:21,354 - src.importer_cli.cli - WARNING - Duplicate user skipped: Duplicate user found: user_id=3
+2026-02-04 15:04:09,484 - __main__ - ERROR - Failed to import user at line 2: Invalid email format: email=ww
+2026-02-04 15:04:09,484 - importer_cli.parser.parser - WARNING - Line 3: Required field 'email' is empty
+2026-02-04 15:04:09,484 - __main__ - ERROR - Failed to import user at line 3: Invalid email format: email=
+2026-02-04 15:04:09,485 - importer_cli.repository.repository - WARNING - Duplicate user found: 3
+2026-02-04 15:04:09,485 - __main__ - WARNING - Duplicate user skipped: Duplicate user found: user_id=3

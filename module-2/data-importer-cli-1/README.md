@@ -71,6 +71,9 @@ user_id,name,email
 # Simple import
 python src/importer_cli/cli.py users.csv
 
+# Use existing sample users file import
+python src/importer_cli/cli.py data/users.csv
+
 # With custom database location
 python src/importer_cli/cli.py users.csv --db-file custom_db.json
 
