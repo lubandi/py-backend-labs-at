@@ -36,7 +36,7 @@ This project follows a **Clean Architecture** approach:
 
 - Docker & Docker Compose
 
-### Running with Docker (Recommended)
+### Running with Docker
 
 1.  **Build and Start**:
     ```bash
