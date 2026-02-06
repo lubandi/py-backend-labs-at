@@ -45,10 +45,10 @@
     },
     "courses_analyzed": 7,
     "departments": [
-        "MAT",
-        "HIS",
         "ENG",
         "PHY",
-        "CS1"
+        "MAT",
+        "CS1",
+        "HIS"
     ]
 }
