@@ -20,6 +20,30 @@ def parse_student_data(
         - List of Student objects with their grades
         - Dictionary of Course objects keyed by course_id
 
+        Example:
+        >>> students, courses = parse_student_data(raw_data)
+
+        >>> students[0]
+        Student(
+            student_id='S001',
+            first_name='John',
+            last_name='Doe',
+            major='CS',
+            year=2023,
+            grades=[
+                Grade(course_id='CS101', score=95.5, credits=3, semester='Fall 2023'),
+                Grade(course_id='MATH101', score=88.0, credits=4, semester='Fall 2023'),
+                Grade(course_id='CS102', score=91.0, credits=4, semester='Spring 2024')
+            ]
+        )
+
+        >>> courses['CS101']
+        Course(
+            course_id='CS101',
+            name='Intro into CS',
+            department='CS1'
+        )
+
     Note:
         Assumes denormalized CSV format with one grade per row.
         Also builds a local registry of Courses found in the data.

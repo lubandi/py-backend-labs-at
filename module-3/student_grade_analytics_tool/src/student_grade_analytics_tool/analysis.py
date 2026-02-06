@@ -14,6 +14,21 @@ class GradeAnalyzer:
     def calculate_stats(scores: List[float]) -> Dict[str, float]:
         """
         Calculates mean, median, and mode for a list of scores.
+
+        Example:
+            >>> GradeAnalyzer.calculate_stats([95.5, 88.0, 91.0])
+            {
+                'mean': 91.5,
+                'median': 91.0,
+                'mode': 95.5
+            }
+
+            >>> GradeAnalyzer.calculate_stats([])
+            {
+                'mean': 0.0,
+                'median': 0.0,
+                'mode': 0.0
+            }
         """
         if not scores:
             return {"mean": 0.0, "median": 0.0, "mode": 0.0}
@@ -35,6 +50,16 @@ class GradeAnalyzer:
         """
         Computes the frequency of each letter grade across all students.
         Uses Counter as requested.
+
+        Example:
+            >>> GradeAnalyzer.get_grade_distribution(students)
+            Counter({
+                'A': 4,
+                'B': 3,
+                'C': 2,
+                'D': 0,
+                'F': 1
+            })
         """
         all_grades = []
         for student in students:
@@ -58,6 +83,20 @@ class GradeAnalyzer:
         """
         Groups students by their major.
         Uses defaultdict as requested.
+
+        Example:
+            >>> grouped = GradeAnalyzer.group_students_by_major(students)
+
+            >>> grouped['CS']
+            [
+                Student(student_id='S001', ...),
+                Student(student_id='S004', ...)
+            ]
+
+            >>> grouped['ENG']
+            [
+                Student(student_id='S002', ...)
+            ]
         """
         grouped = defaultdict(list)
         for student in students:
@@ -69,6 +108,16 @@ class GradeAnalyzer:
         """
         Ranks students by their overall GPA.
         Uses OrderedDict to maintain the sorted order.
+
+        Example:
+            >>> ranked = GradeAnalyzer.rank_students(students)
+
+            >>> list(ranked.items())
+            [
+                (Student(student_id='S004', ...), 98.0),
+                (Student(student_id='S001', ...), 91.5),
+                (Student(student_id='S002', ...), 83.75)
+            ]
         """
         student_gpas = {}
         for student in students:
@@ -87,6 +136,13 @@ class GradeAnalyzer:
     ) -> List[float]:
         """
         Calculates rolling average using deque.
+
+        Example:
+            >>> GradeAnalyzer.calculate_rolling_average(
+            ...     [95.5, 88.0, 91.0, 85.0],
+            ...     window_size=3
+            ... )
+            [95.5, 91.75, 91.5, 88.0]
         """
         if not scores:
             return []
@@ -104,6 +160,17 @@ class GradeAnalyzer:
     def generate_ascii_histogram(distribution: Counter) -> str:
         """
         Generates a text-based histogram of grade distribution.
+
+        Example:
+            >>> distribution = Counter({'A': 4, 'B': 3, 'C': 2, 'F': 1})
+            >>> print(GradeAnalyzer.generate_ascii_histogram(distribution))
+
+            Grade Distribution:
+            A | ████████████████ (4)
+            B | ████████████ (3)
+            C | ████████ (2)
+            D |  (0)
+            F | ████ (1)
         """
         if not distribution:
             return "No data for histogram."
