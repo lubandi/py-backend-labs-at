@@ -72,7 +72,7 @@ This monorepo contains my completed labs and projects from various modules, demo
 Each module contains its own `requirements.txt` file. Navigate to the specific project directory and install dependencies:
 
 ```bash
-cd module-2/lab-1
+cd module-2/lab-name
 pip install -r requirements.txt
 ```
 
