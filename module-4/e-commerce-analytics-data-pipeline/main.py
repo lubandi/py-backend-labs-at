@@ -9,8 +9,8 @@ This script demonstrates the complete data pipeline including:
 """
 
 from e_commerce_analytics_data_pipeline.analytics import AnalyticsEngine
-from e_commerce_analytics_data_pipeline.database.db import db
 from e_commerce_analytics_data_pipeline.database.nosql import NoSQLManager
+from e_commerce_analytics_data_pipeline.database.postgres import db
 from e_commerce_analytics_data_pipeline.database.seed_data import init_db, seed_data
 
 
