@@ -15,11 +15,24 @@ class UrlShortenerService:
         return "".join(secrets.choice(chars) for _ in range(length))
 
     @staticmethod
-    def shorten_url(original_url: str) -> ShortURL:
+    def shorten_url(original_url: str, custom_code: str = None) -> ShortURL:
         """
         Create a new ShortURL instance.
-        If the URL already exists, return the existing instance (Idempotency).
+        If custom_code is provided, try to use it.
+        If the URL already exists (and no custom code), return the existing instance (Idempotency).
         """
+        # If custom code is provided, we skip the idempotency check for existing URL
+        # because the user explicitly wants THIS code for THIS url.
+        if custom_code:
+            if ShortURL.objects.filter(short_code=custom_code).exists():
+                raise ValueError("Custom code already exists.")
+
+            instance = ShortURL.objects.create(
+                original_url=original_url, short_code=custom_code
+            )
+            cache.set(f"short_url:{custom_code}", original_url, timeout=None)
+            return instance
+
         # OPTIMIZATION: Check if this URL is already shortened
         existing = ShortURL.objects.filter(original_url=original_url).first()
         if existing:

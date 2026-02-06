@@ -11,8 +11,10 @@ urlpatterns = [
         AnalyticsViewSet.as_view({"get": "retrieve"}),
         name="url_stats",
     ),
-    # only capture 6 length numbers + leter patterns because our codes are that long
+    # capture alphanumeric codes (1-10 chars)
     re_path(
-        r"^(?P<short_code>[a-zA-Z0-9]{6})$", RedirectView.as_view(), name="redirect_url"
+        r"^(?P<short_code>[a-zA-Z0-9]{1,10})$",
+        RedirectView.as_view(),
+        name="redirect_url",
     ),
 ]

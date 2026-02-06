@@ -5,6 +5,16 @@ from .models import ShortURL
 
 class ShortURLCreateSerializer(serializers.Serializer):
     url = serializers.URLField(max_length=2000, required=True)
+    custom_code = serializers.CharField(
+        max_length=10,
+        required=False,
+        help_text="Optional custom alias for the URL (alphanumeric, max 10 chars).",
+    )
+
+    def validate_custom_code(self, value):
+        if not value.isalnum():
+            raise serializers.ValidationError("Custom code must be alphanumeric.")
+        return value
 
 
 class ShortURLResponseSerializer(serializers.ModelSerializer):

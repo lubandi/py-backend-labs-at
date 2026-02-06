@@ -29,7 +29,14 @@ class ShortenViewSet(viewsets.ViewSet):
         serializer = ShortURLCreateSerializer(data=request.data)
         if serializer.is_valid():
             url = serializer.validated_data["url"]
-            short_url_instance = UrlShortenerService.shorten_url(url)
+            custom_code = serializer.validated_data.get("custom_code")
+
+            try:
+                short_url_instance = UrlShortenerService.shorten_url(
+                    url, custom_code=custom_code
+                )
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
             response_serializer = ShortURLResponseSerializer(
                 short_url_instance, context={"request": request}
