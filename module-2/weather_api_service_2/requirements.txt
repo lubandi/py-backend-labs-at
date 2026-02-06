@@ -1,0 +1,10 @@
+colorama==0.4.6
+coverage==7.13.1
+iniconfig==2.3.0
+packaging==25.0
+pluggy==1.6.0
+Pygments==2.19.2
+pytest==9.0.2
+pytest-cov==7.0.0
+pytest-mock==3.15.1
+-e git+https://github.com/lubandi/py-backend-labs-at.git@eba5c38f6a9f330b15e00bdcbbdaefeb9c5a3376#egg=weather_api_service_2&subdirectory=module-2\weather_api_service_2
