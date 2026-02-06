@@ -138,3 +138,23 @@ Analysis complete. Report saved to report.json
     "departments": ["CS", "MATH", "PHYS"]
 }
 ```
+
+
+## Memory Comparison Module
+
+The `memory_comparison` module demonstrates Python collection efficiencies:
+
+### Run Full Comparison
+
+```python
+from memory_comparison.all_comparisons import run_all_comparisons
+run_all_comparisons()
+```
+
+### Key Comparisons Included
+
+1. **NamedTuple vs Class vs Dictionary**: Memory efficiency for data records
+2. **Dataclass with/without `__slots__`**: 40-60% memory reduction
+3. **List vs Set vs Dictionary**: O(n) vs O(1) membership testing
+4. **List vs Deque**: O(n) vs O(1) queue operations
+5. **Counter vs Manual Counting**: Cleaner API with similar performance
