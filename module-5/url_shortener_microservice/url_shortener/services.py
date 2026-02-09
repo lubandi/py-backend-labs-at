@@ -61,9 +61,7 @@ class UrlShortenerService:
         cached_url = cache.get(f"short_url:{short_code}")
 
         if cached_url:
-            # Increment clicks in DB asynchronously or sync?
-            # Doing it sync here but using F() for atomicity.
-            # Ideally this could be a background task (Celery), but for this lab, sync is fine.
+            # Increment clicks in DB
             ShortURL.objects.filter(short_code=short_code).update(
                 clicks=F("clicks") + 1
             )
