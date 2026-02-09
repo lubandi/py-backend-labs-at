@@ -123,4 +123,6 @@ SPECTACULAR_SETTINGS = {
 }
 
 # CORS Configuration
-CORS_ALLOW_ALL_ORIGINS = True  # Allow all just for this lab/dev environment
+CORS_ALLOW_ALL_ORIGINS = (
+    True  # Allow all just for this lab/dev environment but not real world app
+)
