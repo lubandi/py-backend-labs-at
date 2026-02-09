@@ -46,7 +46,7 @@ class UrlShortenerService:
         instance = ShortURL.objects.create(original_url=original_url, short_code=code)
 
         # Cache the result for fast lookups
-        cache.set(f"short_url:{code}", original_url, timeout=None)  # No expiry
+        cache.set(f"short_url:{code}", original_url, timeout=None)
 
         return instance
 
@@ -75,8 +75,9 @@ class UrlShortenerService:
             cache.set(f"short_url:{short_code}", instance.original_url, timeout=None)
 
             # Increment clicks
-            instance.clicks = F("clicks") + 1
-            instance.save(update_fields=["clicks"])
+            ShortURL.objects.filter(short_code=short_code).update(
+                clicks=F("clicks") + 1
+            )
 
             return instance.original_url
         except ShortURL.DoesNotExist:
