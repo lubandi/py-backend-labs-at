@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from .managers import URLManager
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -16,6 +18,8 @@ class URL(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
     )
+
+    objects = URLManager()
 
     # Metadata
     title = models.CharField(max_length=255, null=True, blank=True)
