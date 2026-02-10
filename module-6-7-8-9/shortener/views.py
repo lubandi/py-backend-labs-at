@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from .utils import generate_short_code
 
 
 class URLCreateView(APIView):
+    @extend_schema(request=URLSerializer, responses=URLSerializer)
     def post(self, request):
         serializer = URLSerializer(data=request.data)
         if serializer.is_valid():
