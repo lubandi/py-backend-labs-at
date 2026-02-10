@@ -26,3 +26,33 @@ class URLManager(models.Manager):
         Returns the top N most visited URLs.
         """
         return self.order_by("-click_count")[:n]
+
+    def with_tags(self):
+        """
+        Optimizes fetching of tags (ManyToMany) to avoid N+1 problems.
+        """
+        return self.prefetch_related("tags")
+
+    def with_owner(self):
+        """
+        Optimizes fetching of owner (ForeignKey) to avoid N+1 problems.
+        """
+        return self.select_related("owner")
+
+    def with_all_info(self):
+        """
+        Optimizes fetching of all related data (tags + owner).
+        """
+        return self.select_related("owner").prefetch_related("tags")
+
+
+class ClickManager(models.Manager):
+    def clicks_per_country(self, url_id):
+        """Aggregates clicks by country basing on a specific URL using annotate."""
+
+        return (
+            self.filter(url_id=url_id)
+            .values("country")
+            .annotate(total=models.Count("id"))
+            .order_by("-total")
+        )

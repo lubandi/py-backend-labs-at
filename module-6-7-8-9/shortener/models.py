@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from .managers import URLManager
+from .managers import ClickManager, URLManager
 
 
 class Tag(models.Model):
@@ -13,7 +13,7 @@ class Tag(models.Model):
 
 class URL(models.Model):
     original_url = models.URLField(max_length=500)
-    short_code = models.CharField(max_length=10, unique=True)
+    short_code = models.CharField(max_length=10, db_index=True, unique=True)
     custom_alias = models.CharField(max_length=50, unique=True, null=True, blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
@@ -34,7 +34,7 @@ class URL(models.Model):
     # Relationships
     tags = models.ManyToManyField(Tag, blank=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -49,3 +49,5 @@ class Click(models.Model):
     country = models.CharField(max_length=100, null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
     referrer = models.URLField(null=True, blank=True)
+
+    objects = ClickManager()
