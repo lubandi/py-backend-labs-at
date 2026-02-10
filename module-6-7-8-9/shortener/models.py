@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -11,6 +12,24 @@ class Tag(models.Model):
 class URL(models.Model):
     original_url = models.URLField(max_length=500)
     short_code = models.CharField(max_length=10, unique=True)
+    custom_alias = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    # Metadata
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    favicon = models.URLField(null=True, blank=True)
+
+    # Settings & Analytics
+    is_active = models.BooleanField(default=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    click_count = models.PositiveIntegerField(default=0)
+
+    # Relationships
+    tags = models.ManyToManyField(Tag, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
