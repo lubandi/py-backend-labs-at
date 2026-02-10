@@ -35,3 +35,13 @@ class URL(models.Model):
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
+
+
+class Click(models.Model):
+    url = models.ForeignKey(URL, on_delete=models.CASCADE, related_name="clicks")
+    clicked_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    referrer = models.URLField(null=True, blank=True)
