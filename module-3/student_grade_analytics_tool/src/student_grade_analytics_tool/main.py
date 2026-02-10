@@ -96,7 +96,7 @@ def main():
     else:
         input_file = sys.argv[1]
 
-    output_file = sys.argv[2] if len(sys.argv) > 2 else "report.json"
+    output_file = sys.argv[2] if len(sys.argv) > 2 else "data/report.json"
 
     print(f"Processing data from {input_file}...")
 

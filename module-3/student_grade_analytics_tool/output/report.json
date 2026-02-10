@@ -42,5 +42,13 @@
         "ENG": 1,
         "PHYS": 1,
         "MATH": 1
-    }
+    },
+    "courses_analyzed": 7,
+    "departments": [
+        "CS1",
+        "ENG",
+        "PHY",
+        "MAT",
+        "HIS"
+    ]
 }
