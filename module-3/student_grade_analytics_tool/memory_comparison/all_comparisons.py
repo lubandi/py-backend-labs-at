@@ -47,7 +47,6 @@ class RegularClass:
     - Supports inheritance
 
     Disadvantages:
-    - More memory than NamedTuple
     - More verbose for simple data containers
     """
 
@@ -62,10 +61,10 @@ def compare_grade_structures():
     """
     Compare memory usage of different grade representations.
 
-    Expected results:
-    - Dictionary: Largest (~240 bytes) due to overhead of hash table
-    - Regular Class: Medium (~56 bytes) due to __dict__ overhead
-    - NamedTuple: Smallest (~48 bytes) same as regular tuple
+    Results:
+    - Dictionary: Largest (~184 bytes) due to overhead of hash table
+    - Regular Class: Medium (~48 bytes) due to __dict__ overhead
+    - NamedTuple: Efficient (~72 bytes) because it's immutable same as regular tuple
 
     Returns:
         dict: Memory sizes for each structure
@@ -101,7 +100,7 @@ class StudentWithoutSlots:
     - Higher memory: Each instance has a dictionary
     - Slower attribute access: Dictionary lookup
 
-    Size: ~584 bytes
+    Size: ~904 bytes
     """
 
     student_id: str
@@ -122,7 +121,7 @@ class StudentWithSlots:
     - Cannot add new attributes dynamically
     - Faster attribute access: Direct memory access
 
-    Size: ~256 bytes (56% memory saved!)
+    Size: ~328 bytes (56% memory saved!)
 
     Best for: Many instances of same structure
     """
