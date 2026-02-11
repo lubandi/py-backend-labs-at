@@ -60,6 +60,12 @@ erDiagram
 
 ## Design Decisions
 - **Normalization**: Schema is in 3NF to reduce redundancy.
+Normalization
+Normalization prevents data duplication and ensures consistency:
+  - 1NF: Each cell holds atomic (indivisible) values.
+  - 2NF: Remove partial dependencies on part of a composite key. (OrderID, ProductID), ProductName
+  - 3NF: No non-key field depends on another non-key field.
+
 - **Polyglot Persistence**:
   - `JSONB` in Postgres for purely product attributes (size, color) allows flexibility without altering schema.
   - `Redis` prevents hitting the DB for frequently accessed "Top Products".
