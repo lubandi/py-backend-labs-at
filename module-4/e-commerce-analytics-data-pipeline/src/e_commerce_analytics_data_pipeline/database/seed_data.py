@@ -12,7 +12,7 @@ import os
 import random
 import traceback
 
-from e_commerce_analytics_data_pipeline.database.db import db
+from e_commerce_analytics_data_pipeline.database.postgres import db
 from e_commerce_analytics_data_pipeline.models import Customer, Product
 from e_commerce_analytics_data_pipeline.operations import EcommerceOperations
 from faker import Faker

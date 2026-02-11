@@ -9,7 +9,7 @@ Contains complex SQL queries for business analytics including:
 
 import re
 
-from e_commerce_analytics_data_pipeline.database.db import db
+from e_commerce_analytics_data_pipeline.database.postgres import db
 
 
 class AnalyticsEngine:

@@ -8,8 +8,8 @@ including transactional order creation with ACID properties.
 import json
 from typing import Any, Dict, List
 
-from e_commerce_analytics_data_pipeline.database.db import db
 from e_commerce_analytics_data_pipeline.database.nosql import NoSQLManager
+from e_commerce_analytics_data_pipeline.database.postgres import db
 from e_commerce_analytics_data_pipeline.models import Customer, Product
 
 
