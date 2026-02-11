@@ -63,13 +63,13 @@ erDiagram
 Normalization
 Normalization prevents data duplication and ensures consistency:
   - 1NF: Each cell holds atomic (indivisible) values.
-  - 2NF: Remove partial dependencies on part of a composite key. (OrderID, ProductID), ProductName
+  - 2NF: Remove partial dependencies on part of a composite key. (OrderID, ProductID), ProductName, Quantity
   - 3NF: No non-key field depends on another non-key field.
 
 - **Polyglot Persistence**:
   - `JSONB` in Postgres for purely product attributes (size, color) allows flexibility without altering schema.
   - `Redis` prevents hitting the DB for frequently accessed "Top Products".
-  - `MongoDB` handles caching shopping carts without easier scaling.
+  - `MongoDB` handles caching shopping carts.
 - **Transactions**: `create_order` uses `SELECT ... FOR UPDATE` to lock product rows, ensuring stock isn't oversold (Race Condition handling).
 
 ## Performance Optimization
