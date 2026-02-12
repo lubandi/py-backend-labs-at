@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import URL
+from .models import URL, Click
 from .serializers import URLSerializer
 from .utils import generate_short_code
 
@@ -55,6 +55,18 @@ class URLCreateView(APIView):
 class URLRedirectView(APIView):
     def get(self, request, short_code):
         url = get_object_or_404(URL, short_code=short_code)
+
+        # Update click count
+        url.click_count += 1
+        url.save()
+
+        # Track click details (Synchronous for now)
+        Click.objects.create(
+            url=url,
+            ip_address=request.META.get("REMOTE_ADDR"),
+            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+        )
+
         return redirect(url.original_url)
 
 
