@@ -33,12 +33,17 @@ class URLCreateView(APIView):
                         status=status.HTTP_403_FORBIDDEN,
                     )
 
-            code = generate_short_code()
-            while URL.objects.filter(short_code=code).exists():
-                code = generate_short_code()
+            custom_alias = serializer.validated_data.get("custom_alias")
 
-            # Save the new URL object with the generated code and owner
-            serializer.save(short_code=code, owner=request.user)
+            if custom_alias:
+                # If custom alias is provided (Premium only check passed above), use it
+                serializer.save(short_code=custom_alias, owner=request.user)
+            else:
+                # Otherwise generate a random code
+                code = generate_short_code()
+                while URL.objects.filter(short_code=code).exists():
+                    code = generate_short_code()
+                serializer.save(short_code=code, owner=request.user)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
