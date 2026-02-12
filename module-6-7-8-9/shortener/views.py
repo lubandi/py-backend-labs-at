@@ -1,4 +1,5 @@
 from core.permissions import IsOwnerOrReadOnly
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -54,20 +55,30 @@ class URLCreateView(APIView):
 
 class URLRedirectView(APIView):
     def get(self, request, short_code):
-        url = get_object_or_404(URL, short_code=short_code)
+        # 1. Attempt to get from cache
+        target_url = cache.get(short_code)
 
-        # Update click count
+        if not target_url:
+            # Cache Miss: Fetch from DB and Cache
+            url = get_object_or_404(URL, short_code=short_code)
+            target_url = url.original_url
+            cache.set(short_code, target_url, timeout=3600)
+        else:
+            # Cache Hit: We still need the object for tracking (Sync)
+            # In Phase 3 (Async), this DB hit will be removed.
+            url = get_object_or_404(URL, short_code=short_code)
+
+        # 2. Track Click (Synchronous)
         url.click_count += 1
         url.save()
 
-        # Track click details (Synchronous for now)
         Click.objects.create(
             url=url,
             ip_address=request.META.get("REMOTE_ADDR"),
             user_agent=request.META.get("HTTP_USER_AGENT", ""),
         )
 
-        return redirect(url.original_url)
+        return redirect(target_url)
 
 
 class URLDetailView(APIView):
@@ -90,6 +101,8 @@ class URLDetailView(APIView):
         serializer = URLSerializer(url, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            # Invalidate Cache
+            cache.delete(short_code)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -97,4 +110,6 @@ class URLDetailView(APIView):
     def delete(self, request, short_code):
         url = self.get_object(short_code)
         url.delete()
+        # Invalidate Cache
+        cache.delete(short_code)
         return Response(status=status.HTTP_204_NO_CONTENT)
