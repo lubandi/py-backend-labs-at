@@ -1,3 +1,4 @@
+from core.permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404, redirect
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -55,3 +56,33 @@ class URLRedirectView(APIView):
     def get(self, request, short_code):
         url = get_object_or_404(URL, short_code=short_code)
         return redirect(url.original_url)
+
+
+class URLDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_object(self, short_code):
+        obj = get_object_or_404(URL, short_code=short_code)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    @extend_schema(responses=URLSerializer)
+    def get(self, request, short_code):
+        url = self.get_object(short_code)
+        serializer = URLSerializer(url)
+        return Response(serializer.data)
+
+    @extend_schema(request=URLSerializer, responses=URLSerializer)
+    def put(self, request, short_code):
+        url = self.get_object(short_code)
+        serializer = URLSerializer(url, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={204: None})
+    def delete(self, request, short_code):
+        url = self.get_object(short_code)
+        url.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
