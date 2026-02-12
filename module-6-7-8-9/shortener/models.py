@@ -15,9 +15,7 @@ class URL(models.Model):
     original_url = models.URLField(max_length=500)
     short_code = models.CharField(max_length=10, db_index=True, unique=True)
     custom_alias = models.CharField(max_length=50, unique=True, null=True, blank=True)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
-    )
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     objects = URLManager()
 
