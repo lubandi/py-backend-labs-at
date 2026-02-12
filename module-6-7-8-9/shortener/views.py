@@ -7,8 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import URL, Click
+from .models import URL
 from .serializers import URLSerializer
+from .tasks import track_click_task
 from .utils import generate_short_code
 
 
@@ -63,20 +64,12 @@ class URLRedirectView(APIView):
             url = get_object_or_404(URL, short_code=short_code)
             target_url = url.original_url
             cache.set(short_code, target_url, timeout=3600)
-        else:
-            # Cache Hit: We still need the object for tracking (Sync)
-            # In Phase 3 (Async), this DB hit will be removed.
-            url = get_object_or_404(URL, short_code=short_code)
 
-        # 2. Track Click (Synchronous)
-        url.click_count += 1
-        url.save()
+        # 2. Track Click (Async). Perform the task asynchronously to keep the redirect fast.
+        ip = request.META.get("REMOTE_ADDR")
+        agent = request.META.get("HTTP_USER_AGENT", "")
 
-        Click.objects.create(
-            url=url,
-            ip_address=request.META.get("REMOTE_ADDR"),
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
-        )
+        track_click_task.delay(short_code, ip, agent)
 
         return redirect(target_url)
 
