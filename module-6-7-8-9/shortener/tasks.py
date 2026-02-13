@@ -21,3 +21,18 @@ def track_click_task(url_short_code, ip_address, user_agent):
     except URL.DoesNotExist:
         # URL might have been deleted before task ran
         pass
+
+
+@shared_task
+def archive_expired_urls():
+    """
+    Periodic task to deactivate expired URLs.
+    """
+    from django.utils import timezone
+
+    expired_urls = URL.objects.filter(is_active=True, expires_at__lt=timezone.now())
+
+    # Bulk update/Deactivate
+    count = expired_urls.update(is_active=False)
+
+    return f"Deactivated {count} expired URLs."
