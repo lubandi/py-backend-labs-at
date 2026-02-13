@@ -26,3 +26,7 @@ venv.bak/
 
 # Docker
 .docker_temp/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
