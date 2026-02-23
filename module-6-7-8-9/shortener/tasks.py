@@ -38,7 +38,30 @@ def track_click_task(url_short_code, ip_address, user_agent):
         url.save()
 
         # Create detailed click record
-        Click.objects.create(url=url, ip_address=ip_address, user_agent=user_agent)
+        click = Click(url=url, ip_address=ip_address, user_agent=user_agent)
+
+        # Default fallback values for GeoIP
+        click.country = "Unknown"
+        click.city = "Unknown"
+
+        if ip_address and ip_address not in ("127.0.0.1", "localhost", "::1"):
+            import httpx
+
+            try:
+                # Use a free GeoIP API
+                response = httpx.get(
+                    f"http://ip-api.com/json/{ip_address}", timeout=5.0
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("status") == "success":
+                        click.country = data.get("country") or "Unknown"
+                        click.city = data.get("city") or "Unknown"
+            except Exception:
+                # Silently fail or log the GeoIP error; don't crash the click tracking
+                pass
+
+        click.save()
     except URL.DoesNotExist:
         # URL might have been deleted before task ran
         pass
