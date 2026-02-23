@@ -66,9 +66,32 @@ class URLRedirectView(APIView):
 
         if not target_url:
             # Cache Miss: Fetch from DB and Cache
+            from django.utils import timezone
+
             url = get_object_or_404(URL, short_code=short_code)
+
+            if not url.is_active:
+                return Response(
+                    {"error": "This URL is inactive."}, status=status.HTTP_410_GONE
+                )
+
+            if url.expires_at and timezone.now() > url.expires_at:
+                return Response(
+                    {"error": "This URL has expired."}, status=status.HTTP_410_GONE
+                )
+
             target_url = url.original_url
-            cache.set(short_code, target_url, timeout=3600)
+
+            # Calculate cache timeout to respect expiration
+            timeout = 3600
+            if url.expires_at:
+                seconds_to_expire = int(
+                    (url.expires_at - timezone.now()).total_seconds()
+                )
+                timeout = min(timeout, seconds_to_expire)
+
+            if timeout > 0:
+                cache.set(short_code, target_url, timeout=timeout)
 
         # 2. Track Click (Async). Perform the task asynchronously to keep the redirect fast.
         ip = request.META.get("REMOTE_ADDR")
