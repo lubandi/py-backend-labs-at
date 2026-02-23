@@ -56,6 +56,18 @@ services:
       - redis
     restart: always
 
+  preview-db:
+    image: postgres:15-alpine
+    volumes:
+      - preview_postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=preview_user
+      - POSTGRES_PASSWORD=preview_pass
+      - POSTGRES_DB=preview_db
+    ports:
+      - "5433:5432"
+    restart: always
+
   preview-service:
     build: ./services/preview
     command: python manage.py runserver 0.0.0.0:8001
@@ -63,7 +75,12 @@ services:
       - ./services/preview:/app
     ports:
       - "8001:8001"
+    env_file:
+      - .env
+    depends_on:
+      - preview-db
     restart: always
 
 volumes:
   postgres_data:
+  preview_postgres_data:

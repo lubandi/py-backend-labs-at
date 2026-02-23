@@ -2,3 +2,5 @@ Django>=5.0
 djangorestframework
 httpx
 beautifulsoup4
+psycopg2-binary
+django-environ>=0.11
