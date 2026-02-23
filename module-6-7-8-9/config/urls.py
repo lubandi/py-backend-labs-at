@@ -27,20 +27,20 @@ from shortener.views import URLRedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/", include("api.urls")),
+    path("api/<str:version>/", include("api.urls")),
     # Swagger UI
-    path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/<str:version>/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "api/v1/schema/swagger-ui/",
+        "api/<str:version>/schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
     path(
-        "api/v1/schema/redoc/",
+        "api/<str:version>/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    # Root Redirect
+    # Root Redirect (defaults to v1)
     path(
         "",
         RedirectView.as_view(url="/api/v1/schema/swagger-ui/", permanent=False),
