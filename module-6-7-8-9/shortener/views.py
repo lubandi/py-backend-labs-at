@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from .models import URL
 from .serializers import URLSerializer
+from .services import fetch_url_metadata
 from .tasks import track_click_task
 from .utils import generate_short_code
 
@@ -37,16 +38,20 @@ class URLCreateView(APIView):
                     )
 
             custom_alias = serializer.validated_data.get("custom_alias")
+            original_url = serializer.validated_data.get("original_url")
+
+            # External Call to Preview Service
+            metadata = fetch_url_metadata(original_url)
 
             if custom_alias:
                 # If custom alias is provided (Premium only check passed above), use it
-                serializer.save(short_code=custom_alias, owner=request.user)
+                serializer.save(short_code=custom_alias, owner=request.user, **metadata)
             else:
                 # Otherwise generate a random code
                 code = generate_short_code()
                 while URL.objects.filter(short_code=code).exists():
                     code = generate_short_code()
-                serializer.save(short_code=code, owner=request.user)
+                serializer.save(short_code=code, owner=request.user, **metadata)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 

@@ -10,6 +10,9 @@ class URLSerializer(serializers.ModelSerializer):
             "original_url",
             "short_code",
             "custom_alias",
+            "title",
+            "description",
+            "favicon",
             "tags",
             "expires_at",
             "click_count",
@@ -17,4 +20,12 @@ class URLSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["short_code", "click_count", "created_at", "updated_at"]
+        read_only_fields = [
+            "short_code",
+            "title",
+            "description",
+            "favicon",
+            "click_count",
+            "created_at",
+            "updated_at",
+        ]

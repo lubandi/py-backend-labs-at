@@ -40,6 +40,10 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1"])
 
+PREVIEW_SERVICE_URL = env(
+    "PREVIEW_SERVICE_URL", default="http://preview-service:8001/extract/"
+)
+
 
 # Application definition
 
@@ -166,7 +170,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
