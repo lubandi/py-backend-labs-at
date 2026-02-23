@@ -106,7 +106,7 @@ class URLRedirectView(APIView):
     )
     def get(self, request, short_code):
         # 1. Attempt to get from cache
-        target_url = cache.get(short_code)
+        target_url = cache.get(f"url:{short_code}")
 
         if not target_url:
             # Cache Miss: Fetch from DB and Cache
@@ -135,7 +135,7 @@ class URLRedirectView(APIView):
                 timeout = min(timeout, seconds_to_expire)
 
             if timeout > 0:
-                cache.set(short_code, target_url, timeout=timeout)
+                cache.set(f"url:{short_code}", target_url, timeout=timeout)
 
         # 2. Track Click (Async). Perform the task asynchronously to keep the redirect fast.
         ip = request.META.get("REMOTE_ADDR")
@@ -185,7 +185,7 @@ class URLDetailView(APIView):
                 fetch_and_save_metadata_task.delay(updated_url.short_code)
 
             # Invalidate Cache
-            cache.delete(short_code)
+            cache.delete(f"url:{short_code}")
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -199,7 +199,7 @@ class URLDetailView(APIView):
         url = self.get_object(short_code)
         url.delete()
         # Invalidate Cache
-        cache.delete(short_code)
+        cache.delete(f"url:{short_code}")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
