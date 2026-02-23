@@ -16,7 +16,7 @@ class ExtractMetadataViewTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
 
-    @patch("extractor.views.httpx.get")
+    @patch("extractor.services.httpx.get")
     def test_valid_extraction(self, mock_get):
         # Mock successful HTML response
         class MockResponse:
@@ -48,7 +48,7 @@ class ExtractMetadataViewTests(TestCase):
         self.assertEqual(response.data["description"], "This is a test description.")
         self.assertEqual(response.data["favicon"], "https://example.com/favicon.ico")
 
-    @patch("extractor.views.httpx.get")
+    @patch("extractor.services.httpx.get")
     def test_fetch_error(self, mock_get):
         import httpx
 
