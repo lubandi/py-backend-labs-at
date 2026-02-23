@@ -1,3 +1,5 @@
+import logging
+
 from core.permissions import IsOwnerOrReadOnly
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
@@ -12,6 +14,8 @@ from .models import URL
 from .serializers import URLSerializer
 from .tasks import fetch_and_save_metadata_task, track_click_task
 from .utils import generate_short_code
+
+logger = logging.getLogger(__name__)
 
 
 class URLPagination(PageNumberPagination):
@@ -91,9 +95,22 @@ class URLCreateView(APIView):
             # Fire off the async task to fetch metadata
             fetch_and_save_metadata_task.delay(url_instance.short_code)
 
+            logger.info(
+                "Short URL created",
+                extra={
+                    "short_code": url_instance.short_code,
+                    "user_id": request.user.id,
+                    "is_premium_alias": bool(custom_alias),
+                },
+            )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # If invalid, return errors
+        logger.warning(
+            "Failed to create URL due to validation errors",
+            extra={"errors": serializer.errors, "user_id": request.user.id},
+        )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -115,11 +132,17 @@ class URLRedirectView(APIView):
             url = get_object_or_404(URL, short_code=short_code)
 
             if not url.is_active:
+                logger.warning(
+                    "Attempted to access inactive URL", extra={"short_code": short_code}
+                )
                 return Response(
                     {"error": "This URL is inactive."}, status=status.HTTP_410_GONE
                 )
 
             if url.expires_at and timezone.now() > url.expires_at:
+                logger.warning(
+                    "Attempted to access expired URL", extra={"short_code": short_code}
+                )
                 return Response(
                     {"error": "This URL has expired."}, status=status.HTTP_410_GONE
                 )

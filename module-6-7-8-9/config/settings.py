@@ -212,13 +212,25 @@ LOGGING = {
     "formatters": {
         "json": {
             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
+            "format": "%(asctime)s %(levelname)s %(name)s %(module)s %(message)s",
         },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "json",
+        },
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
         },
     },
     "root": {
