@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
+from extractor.services import domain_breakers
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -10,6 +11,7 @@ class ExtractMetadataViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.extract_url = reverse("extract_metadata")
+        domain_breakers.clear()
 
     def test_missing_url(self):
         response = self.client.post(self.extract_url, {}, format="json")
@@ -55,8 +57,9 @@ class ExtractMetadataViewTests(TestCase):
         mock_get.side_effect = httpx.RequestError("Connection timeout", request=None)
 
         response = self.client.post(
-            self.extract_url, {"url": "https://example.com"}, format="json"
+            self.extract_url, {"url": "https://broken-example.com"}, format="json"
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Failed to fetch URL", response.data["error"])
+        # Since it retries 3 times and fails, the Circuit Breaker trips and throws a 503 instead of 400.
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertIn("Circuit breaker is open", response.data["error"])

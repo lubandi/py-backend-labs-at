@@ -1,4 +1,5 @@
 import httpx
+import pybreaker
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -25,13 +26,20 @@ class ExtractMetadataView(APIView):
         try:
             metadata = extract_url_metadata(url)
             return Response(metadata)
+        except pybreaker.CircuitBreakerError:
+            return Response(
+                {
+                    "error": "Too many recent failures for this domain. Circuit breaker is open. Please try again later."
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         except httpx.RequestError as e:
             return Response(
-                {"error": f"Failed to fetch URL: {str(e)}"},
+                {"error": f"Failed to fetch URL (Network/Timeout): {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except httpx.HTTPStatusError as e:
             return Response(
-                {"error": f"HTTP Error {e.response.status_code}"},
+                {"error": f"HTTP Error {e.response.status_code} from target website"},
                 status=status.HTTP_400_BAD_REQUEST,
             )

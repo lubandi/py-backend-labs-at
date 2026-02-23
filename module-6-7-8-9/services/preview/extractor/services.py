@@ -1,21 +1,64 @@
-from urllib.parse import urljoin
+from collections import defaultdict
+from urllib.parse import urljoin, urlparse
 
 import httpx
+import pybreaker
 from bs4 import BeautifulSoup
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
+
+# In-memory dictionary for keeping a Circuit Breaker per target domain
+# Fails after 3 consecutive errors, resets after 60 seconds.
+domain_breakers = defaultdict(
+    lambda: pybreaker.CircuitBreaker(fail_max=3, reset_timeout=60)
+)
+
+
+def get_domain_breaker(url: str):
+    domain = urlparse(url).netloc
+    return domain_breakers[domain]
+
+
+# Retry up to 3 times, with exponential backoff (2s, 4s, 8s)
+# Only try again if it's a network error or a 5xx Server error.
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type((httpx.RequestError, httpx.HTTPStatusError)),
+    reraise=True,
+)
+def fetch_url(url: str):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
+    breaker = get_domain_breaker(url)
+
+    # Wrap the actual HTTP call with the circuit breaker
+    @breaker
+    def _execute_request():
+        response = httpx.get(url, timeout=5.0, follow_redirects=True, headers=headers)
+        # Only raise and trigger circuit breaker/retries for 5xx Server Errors
+        # 4xx Client Errors (like 404 Not Found) should just be returned as failed fetches
+        if response.status_code >= 500:
+            response.raise_for_status()
+        return response
+
+    return _execute_request()
 
 
 def extract_url_metadata(url: str) -> dict:
     """
     Fetches the URL and extracts title, description, and favicon.
     Returns a dict with 'title', 'description', 'favicon'.
-    Raises Exception if the fetch fails.
+    Raises Exception if the fetch fails or circuit breaker is open.
     """
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-
-    response = httpx.get(url, timeout=5.0, follow_redirects=True, headers=headers)
-    response.raise_for_status()
+    response = fetch_url(url)
+    response.raise_for_status()  # Catch 4xx errors here to raise Exception without tripping the breaker
 
     soup = BeautifulSoup(response.text, "html.parser")
 
