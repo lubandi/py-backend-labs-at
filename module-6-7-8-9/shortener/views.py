@@ -1,8 +1,9 @@
 from core.permissions import IsOwnerOrReadOnly
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,8 +14,36 @@ from .tasks import fetch_and_save_metadata_task, track_click_task
 from .utils import generate_short_code
 
 
+class URLPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class URLCreateView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses=URLSerializer(many=True),
+        parameters=[
+            OpenApiParameter(
+                name="tag",
+                description="Filter URLs by tag name",
+                required=False,
+                type=str,
+            )
+        ],
+    )
+    def get(self, request):
+        urls = request.user.url_set.all().order_by("-created_at")
+        tag = request.query_params.get("tag")
+        if tag:
+            urls = urls.filter(tags__name=tag)
+
+        paginator = URLPagination()
+        result_page = paginator.paginate_queryset(urls, request, view=self)
+        serializer = URLSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @extend_schema(request=URLSerializer, responses=URLSerializer)
     def post(self, request):
