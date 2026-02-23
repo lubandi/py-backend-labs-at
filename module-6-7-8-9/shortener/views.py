@@ -163,3 +163,55 @@ class URLDetailView(APIView):
         # Invalidate Cache
         cache.delete(short_code)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class URLAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_object(self, short_code):
+        obj = get_object_or_404(URL, short_code=short_code)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    @extend_schema(responses={200: dict})
+    def get(self, request, short_code):
+        from django.db.models import Count
+        from django.db.models.functions import TruncDate
+
+        url = self.get_object(short_code)
+
+        # Base analytics for all tiers
+        analytics = {
+            "total_clicks": url.click_count,
+            "created_at": url.created_at,
+        }
+
+        # Premium Tier gets expanded metrics
+        if request.user.tier == "Premium":
+            clicks = url.clicks.all()
+
+            # 1. Geo-Location Breakdown
+            locations = (
+                clicks.values("country").annotate(count=Count("id")).order_by("-count")
+            )
+            analytics["locations"] = list(locations)
+
+            # 2. Time-Series Breakdown (Clicks per day)
+            time_series = (
+                clicks.annotate(date=TruncDate("clicked_at"))
+                .values("date")
+                .annotate(count=Count("id"))
+                .order_by("date")
+            )
+            # Format datetime dates to string for JSON serialization
+            analytics["time_series"] = [
+                {
+                    "date": entry["date"].strftime("%Y-%m-%d")
+                    if entry["date"]
+                    else None,
+                    "count": entry["count"],
+                }
+                for entry in time_series
+            ]
+
+        return Response(analytics)
