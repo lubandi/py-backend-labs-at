@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
@@ -27,5 +28,8 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
+    # Base extraction paths
     path("", include("extractor.urls")),
+    # Root redirect
+    path("", RedirectView.as_view(url="/api/docs/", permanent=False), name="home"),
 ]
