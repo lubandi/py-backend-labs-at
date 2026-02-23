@@ -148,9 +148,16 @@ class URLDetailView(APIView):
     @extend_schema(request=URLSerializer, responses=URLSerializer)
     def put(self, request, short_code):
         url = self.get_object(short_code)
+        old_url = url.original_url
+
         serializer = URLSerializer(url, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            updated_url = serializer.save()
+
+            # If the target URL changed, re-fetch metadata in the background
+            if updated_url.original_url != old_url:
+                fetch_and_save_metadata_task.delay(updated_url.short_code)
+
             # Invalidate Cache
             cache.delete(short_code)
             return Response(serializer.data)
