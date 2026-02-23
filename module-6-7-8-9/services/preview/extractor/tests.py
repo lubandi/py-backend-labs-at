@@ -14,7 +14,7 @@ class ExtractMetadataViewTests(TestCase):
     def test_missing_url(self):
         response = self.client.post(self.extract_url, {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("error", response.data)
+        self.assertIn("url", response.data)  # Serializer error for missing field
 
     @patch("extractor.services.httpx.get")
     def test_valid_extraction(self, mock_get):

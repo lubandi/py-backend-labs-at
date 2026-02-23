@@ -3,16 +3,17 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .serializers import URLInputSerializer
 from .services import extract_url_metadata
 
 
 class ExtractMetadataView(APIView):
     def post(self, request):
-        url = request.data.get("url")
-        if not url:
-            return Response(
-                {"error": "URL is required"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer = URLInputSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        url = serializer.validated_data["url"]
 
         try:
             metadata = extract_url_metadata(url)
