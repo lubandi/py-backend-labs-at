@@ -24,6 +24,9 @@ class URLCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
+        tags=["URLs"],
+        summary="List User URLs",
+        description="Retrieve a paginated list of URLs owned by the authenticated user. Pass a ?tag= query parameter to filter.",
         responses=URLSerializer(many=True),
         parameters=[
             OpenApiParameter(
@@ -45,7 +48,13 @@ class URLCreateView(APIView):
         serializer = URLSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
-    @extend_schema(request=URLSerializer, responses=URLSerializer)
+    @extend_schema(
+        tags=["URLs"],
+        summary="Create Short URL",
+        description="Create a new short URL. Premium users can specify a custom alias.",
+        request=URLSerializer,
+        responses=URLSerializer,
+    )
     def post(self, request):
         serializer = URLSerializer(data=request.data)
         if serializer.is_valid():
@@ -89,6 +98,12 @@ class URLCreateView(APIView):
 
 
 class URLRedirectView(APIView):
+    @extend_schema(
+        tags=["Redirection"],
+        summary="Redirect Short Code",
+        description="Redirect a short code to its original target URL and track the click event asynchronously.",
+        responses={302: None, 410: dict},
+    )
     def get(self, request, short_code):
         # 1. Attempt to get from cache
         target_url = cache.get(short_code)
@@ -139,13 +154,24 @@ class URLDetailView(APIView):
         self.check_object_permissions(self.request, obj)
         return obj
 
-    @extend_schema(responses=URLSerializer)
+    @extend_schema(
+        tags=["URLs"],
+        summary="Retrieve URL Details",
+        description="Fetch details of a specific URL. Requires ownership.",
+        responses=URLSerializer,
+    )
     def get(self, request, short_code):
         url = self.get_object(short_code)
         serializer = URLSerializer(url)
         return Response(serializer.data)
 
-    @extend_schema(request=URLSerializer, responses=URLSerializer)
+    @extend_schema(
+        tags=["URLs"],
+        summary="Update URL",
+        description="Update an existing URL. Triggers a background metadata refresh if the target changes.",
+        request=URLSerializer,
+        responses=URLSerializer,
+    )
     def put(self, request, short_code):
         url = self.get_object(short_code)
         old_url = url.original_url
@@ -163,7 +189,12 @@ class URLDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(responses={204: None})
+    @extend_schema(
+        tags=["URLs"],
+        summary="Delete URL",
+        description="Hard delete a URL record based on its short code.",
+        responses={204: None},
+    )
     def delete(self, request, short_code):
         url = self.get_object(short_code)
         url.delete()
@@ -180,7 +211,12 @@ class URLAnalyticsView(APIView):
         self.check_object_permissions(self.request, obj)
         return obj
 
-    @extend_schema(responses={200: dict})
+    @extend_schema(
+        tags=["Analytics"],
+        summary="Get URL Analytics",
+        description="Retrieve click analytics for a specific URL. Premium users receive complete time-series and geographic breakdown.",
+        responses={200: dict},
+    )
     def get(self, request, short_code):
         from django.db.models import Count
         from django.db.models.functions import TruncDate
