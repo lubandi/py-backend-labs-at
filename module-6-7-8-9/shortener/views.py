@@ -41,7 +41,7 @@ class URLCreateView(APIView):
             )
         ],
     )
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         urls = request.user.url_set.all().order_by("-created_at")
         tag = request.query_params.get("tag")
         if tag:
@@ -59,7 +59,7 @@ class URLCreateView(APIView):
         request=URLSerializer,
         responses=URLSerializer,
     )
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = URLSerializer(data=request.data)
         if serializer.is_valid():
             # TIER CHECK: Free users max 10 URLs
@@ -121,7 +121,7 @@ class URLRedirectView(APIView):
         description="Redirect a short code to its original target URL and track the click event asynchronously.",
         responses={302: None, 410: dict},
     )
-    def get(self, request, short_code):
+    def get(self, request, short_code, *args, **kwargs):
         # 1. Attempt to get from cache
         target_url = cache.get(f"url:{short_code}")
 
@@ -183,7 +183,7 @@ class URLDetailView(APIView):
         description="Fetch details of a specific URL. Requires ownership.",
         responses=URLSerializer,
     )
-    def get(self, request, short_code):
+    def get(self, request, short_code, *args, **kwargs):
         url = self.get_object(short_code)
         serializer = URLSerializer(url)
         return Response(serializer.data)
@@ -195,7 +195,7 @@ class URLDetailView(APIView):
         request=URLSerializer,
         responses=URLSerializer,
     )
-    def put(self, request, short_code):
+    def put(self, request, short_code, *args, **kwargs):
         url = self.get_object(short_code)
         old_url = url.original_url
 
@@ -218,7 +218,7 @@ class URLDetailView(APIView):
         description="Hard delete a URL record based on its short code.",
         responses={204: None},
     )
-    def delete(self, request, short_code):
+    def delete(self, request, short_code, *args, **kwargs):
         url = self.get_object(short_code)
         url.delete()
         # Invalidate Cache
@@ -240,7 +240,7 @@ class URLAnalyticsView(APIView):
         description="Retrieve click analytics for a specific URL. Premium users receive complete time-series and geographic breakdown.",
         responses={200: dict},
     )
-    def get(self, request, short_code):
+    def get(self, request, short_code, *args, **kwargs):
         from django.db.models import Count
         from django.db.models.functions import TruncDate
 

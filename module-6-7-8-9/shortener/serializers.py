@@ -17,6 +17,7 @@ class URLSerializer(serializers.ModelSerializer):
         allow_empty=True,
         default=list,
         help_text="List of tag names from Work, Personal, Newsletter, Social, Marketing",
+        write_only=True,
     )
 
     class Meta:
