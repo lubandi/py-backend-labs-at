@@ -1,4 +1,5 @@
 import httpx
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +9,12 @@ from .services import extract_url_metadata
 
 
 class ExtractMetadataView(APIView):
+    @extend_schema(
+        request=URLInputSerializer,
+        responses={200: dict, 400: dict},
+        summary="Extract metadata from a given URL",
+        description="Fetches the title, description, and favicon from the target webpage.",
+    )
     def post(self, request):
         serializer = URLInputSerializer(data=request.data)
         if not serializer.is_valid():
