@@ -1,5 +1,5 @@
 """
-URL configuration for config project.
+URL configuration for preview project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -18,34 +18,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
-from shortener.views import URLRedirectView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/<str:version>/", include("api.urls")),
-    # Swagger UI
-    path("api/<str:version>/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "api/<str:version>/schema/swagger-ui/",
+        "api/docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    path(
-        "api/<str:version>/schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
-    ),
-    # Root Redirect (defaults to v1)
-    path(
-        "",
-        RedirectView.as_view(url="/api/v1/schema/swagger-ui/", permanent=False),
-        name="home",
-    ),
-    # Redirect
-    path("<str:short_code>/", URLRedirectView.as_view(), name="redirect"),
+    # Base extraction paths
+    path("", include("extractor.urls")),
+    # Root redirect
+    path("", RedirectView.as_view(url="/api/docs/", permanent=False), name="home"),
 ]

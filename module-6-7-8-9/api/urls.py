@@ -1,7 +1,7 @@
 from core.views import CustomTokenObtainPairView, HealthCheckView, UserRegistrationView
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from shortener.views import URLCreateView, URLDetailView
+from shortener.views import URLAnalyticsView, URLCreateView, URLDetailView
 
 urlpatterns = [
     path("auth/register/", UserRegistrationView.as_view(), name="user-register"),
@@ -9,5 +9,10 @@ urlpatterns = [
     path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("urls/", URLCreateView.as_view(), name="url-create"),
     path("urls/<str:short_code>/", URLDetailView.as_view(), name="url-detail"),
+    path(
+        "urls/analytics/<str:short_code>/",
+        URLAnalyticsView.as_view(),
+        name="url-analytics",
+    ),
     path("health/", HealthCheckView.as_view(), name="health-check"),
 ]
