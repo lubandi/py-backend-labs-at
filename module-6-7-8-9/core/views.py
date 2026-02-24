@@ -29,7 +29,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         health_status = {"status": "ok", "services": {}}
         status_code = status.HTTP_200_OK
 

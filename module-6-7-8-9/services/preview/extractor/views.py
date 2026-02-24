@@ -16,7 +16,7 @@ class ExtractMetadataView(APIView):
         summary="Extract metadata from a given URL",
         description="Fetches the title, description, and favicon from the target webpage.",
     )
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = URLInputSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
