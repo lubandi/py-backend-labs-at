@@ -1,13 +1,15 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .serializers import UserRegistrationSerializer
 
 
+@extend_schema_view(post=extend_schema(tags=["Auth"], summary="Register New User"))
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
@@ -21,15 +23,22 @@ class UserRegistrationView(generics.CreateAPIView):
         )
 
 
+@extend_schema_view(post=extend_schema(tags=["Auth"], summary="Login & Obtain Tokens"))
 class CustomTokenObtainPairView(TokenObtainPairView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "login"
 
 
+@extend_schema_view(post=extend_schema(tags=["Auth"], summary="Refresh Access Token"))
+class CustomTokenRefreshView(TokenRefreshView):
+    pass
+
+
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, request):
+    @extend_schema(tags=["Health"], summary="System Health Check")
+    def get(self, request, *args, **kwargs):
         health_status = {"status": "ok", "services": {}}
         status_code = status.HTTP_200_OK
 

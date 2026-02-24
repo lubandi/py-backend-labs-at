@@ -21,8 +21,25 @@ def fetch_and_save_metadata_task(url_short_code):
             url.description = metadata.get("description") or ""
             url.favicon = metadata.get("favicon") or ""
             url.save(update_fields=["title", "description", "favicon"])
+            return {
+                "action": "metadata_fetched",
+                "short_code": url_short_code,
+                "status": "success",
+                "title": url.title,
+            }
+        return {
+            "action": "metadata_fetched",
+            "short_code": url_short_code,
+            "status": "failed",
+            "reason": "No metadata found",
+        }
     except URL.DoesNotExist:
-        pass
+        return {
+            "action": "metadata_fetched",
+            "short_code": url_short_code,
+            "status": "error",
+            "reason": "URL not found",
+        }
 
 
 @shared_task
@@ -62,9 +79,20 @@ def track_click_task(url_short_code, ip_address, user_agent):
                 pass
 
         click.save()
+        return {
+            "action": "click_tracked",
+            "short_code": url_short_code,
+            "ip": ip_address,
+            "country": click.country,
+        }
     except URL.DoesNotExist:
         # URL might have been deleted before task ran
-        pass
+        return {
+            "action": "click_tracked",
+            "short_code": url_short_code,
+            "status": "error",
+            "reason": "URL not found",
+        }
 
 
 @shared_task
