@@ -41,7 +41,7 @@ def fetch_url(url: str):
     # Wrap the actual HTTP call with the circuit breaker
     @breaker
     def _execute_request():
-        response = httpx.get(url, timeout=5.0, follow_redirects=True, headers=headers)
+        response = httpx.get(url, timeout=10.0, follow_redirects=True, headers=headers)
         # Only raise and trigger circuit breaker/retries for 5xx Server Errors
         # 4xx Client Errors (like 404 Not Found) should just be returned as failed fetches
         if response.status_code >= 500:

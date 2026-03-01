@@ -67,7 +67,7 @@ def track_click_task(url_short_code, ip_address, user_agent):
             try:
                 # Use a free GeoIP API
                 response = httpx.get(
-                    f"http://ip-api.com/json/{ip_address}", timeout=5.0
+                    f"http://ip-api.com/json/{ip_address}", timeout=10.0
                 )
                 if response.status_code == 200:
                     data = response.json()
