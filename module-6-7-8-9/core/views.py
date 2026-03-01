@@ -14,7 +14,7 @@ class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, version=None, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -41,7 +41,7 @@ class HealthCheckView(APIView):
     )  # you don't want to throttle health endpoints. health-check endpoints shouldn't be rate-limited (otherwise load balancers might think the server is down if they check too frequently).
 
     @extend_schema(tags=["Health"], summary="System Health Check")
-    def get(self, request, *args, **kwargs):
+    def get(self, request, version=None, *args, **kwargs):
         health_status = {"status": "ok", "services": {}}
         status_code = status.HTTP_200_OK
 
