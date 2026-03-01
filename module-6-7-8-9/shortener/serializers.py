@@ -107,6 +107,25 @@ class URLSerializer(serializers.ModelSerializer):
 
         return value
 
+    def validate_expires_at(self, value):
+        import datetime
+
+        from django.utils import timezone
+        from rest_framework.exceptions import ValidationError
+
+        if value:
+            now = timezone.now()
+            if value <= now:
+                raise ValidationError("Expiration date must be in the future.")
+
+            max_expiry = now + datetime.timedelta(days=365 * 5)  # 5 years max
+            if value > max_expiry:
+                raise ValidationError(
+                    "Expiration date cannot be more than 5 years in the future."
+                )
+
+        return value
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         # Convert tag objects to list of strings
