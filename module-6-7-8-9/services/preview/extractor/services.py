@@ -1,3 +1,5 @@
+import ipaddress
+import socket
 from collections import defaultdict
 from urllib.parse import urljoin, urlparse
 
@@ -16,6 +18,34 @@ from tenacity import (
 domain_breakers = defaultdict(
     lambda: pybreaker.CircuitBreaker(fail_max=3, reset_timeout=60)
 )
+
+
+def is_safe_url(url: str) -> bool:
+    """Verifies that the URL's resolved IP is not a private, loopback, or reserved address."""
+    try:
+        parsed_url = urlparse(url)
+        hostname = parsed_url.hostname
+
+        if not hostname:
+            return False
+
+        # Resolve hostname to IP
+        ip_address_str = socket.gethostbyname(hostname)
+        ip = ipaddress.ip_address(ip_address_str)
+
+        if (
+            ip.is_private
+            or ip.is_loopback
+            or ip.is_link_local
+            or ip.is_reserved
+            or ip.is_multicast
+        ):
+            return False
+
+        return True
+    except (socket.gaierror, ValueError):
+        # If we can't resolve the hostname or parse the IP, fail securely
+        return False
 
 
 def get_domain_breaker(url: str):
@@ -57,6 +87,9 @@ def extract_url_metadata(url: str) -> dict:
     Returns a dict with 'title', 'description', 'favicon'.
     Raises Exception if the fetch fails or circuit breaker is open.
     """
+    if not is_safe_url(url):
+        raise ValueError("Invalid or unsafe URL provided (SSRF Protection)")
+
     response = fetch_url(url)
     response.raise_for_status()  # Catch 4xx errors here to raise Exception without tripping the breaker
 
