@@ -70,6 +70,40 @@ class HealthCheckView(APIView):
             health_status["services"]["redis"] = "unhealthy"
             status_code = status.HTTP_503_SERVICE_UNAVAILABLE
 
+        # Check Celery
+        try:
+            from config.celery import app as celery_app
+
+            inspector = celery_app.control.inspect(timeout=1.0)
+            availability = inspector.ping()
+            if availability:
+                health_status["services"]["celery"] = "healthy"
+            else:
+                health_status["services"]["celery"] = "unhealthy"
+                status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        except Exception:
+            health_status["services"]["celery"] = "unhealthy"
+            status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+        # Check Preview Service
+        try:
+            import httpx
+            from django.conf import settings
+
+            preview_url = getattr(
+                settings, "PREVIEW_SERVICE_URL", "http://preview-service:8001/extract/"
+            )
+            response = httpx.options(preview_url, timeout=2.0)
+            # 200 OK, 204 No Content, or 405 Method Not Allowed mean it's responding
+            if response.status_code in [200, 204, 405, 400]:
+                health_status["services"]["preview"] = "healthy"
+            else:
+                health_status["services"]["preview"] = "unhealthy"
+                status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        except Exception:
+            health_status["services"]["preview"] = "unhealthy"
+            status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
         if status_code != status.HTTP_200_OK:
             health_status["status"] = "unhealthy"
 
