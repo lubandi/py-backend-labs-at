@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn --bind 0.0.0.0:8000 --workers 3 --threads 2 --timeout 30 config.wsgi:application
     volumes:
       - .:/app
     ports:
@@ -70,7 +70,7 @@ services:
 
   preview-service:
     build: ./services/preview
-    command: python manage.py runserver 0.0.0.0:8001
+    command: gunicorn --bind 0.0.0.0:8001 --workers 2 --threads 2 --timeout 30 config.wsgi:application
     volumes:
       - ./services/preview:/app
     ports:

@@ -30,3 +30,7 @@ venv.bak/
 # Celery
 celerybeat-schedule
 celerybeat.pid
+
+# Gunicorn
+gunicorn.ctl
+*.pid
