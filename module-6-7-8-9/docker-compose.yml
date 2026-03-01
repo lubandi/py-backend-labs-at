@@ -70,7 +70,7 @@ services:
 
   preview-service:
     build: ./services/preview
-    command: gunicorn --bind 0.0.0.0:8001 --workers 2 --threads 2 --timeout 30 config.wsgi:application
+    command: gunicorn --bind 0.0.0.0:8001 --workers 2 --threads 2 --timeout 30 preview.wsgi:application
     volumes:
       - ./services/preview:/app
     ports:
