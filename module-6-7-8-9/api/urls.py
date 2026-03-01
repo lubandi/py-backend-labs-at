@@ -2,6 +2,7 @@ from core.views import (
     CustomTokenObtainPairView,
     CustomTokenRefreshView,
     HealthCheckView,
+    UpgradeToPremiumView,
     UserRegistrationView,
 )
 from django.urls import path
@@ -11,6 +12,7 @@ urlpatterns = [
     path("auth/register/", UserRegistrationView.as_view(), name="user-register"),
     path("auth/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("auth/refresh/", CustomTokenRefreshView.as_view(), name="token_refresh"),
+    path("auth/upgrade/", UpgradeToPremiumView.as_view(), name="user-upgrade"),
     path("urls/", URLCreateView.as_view(), name="url-create"),
     path("urls/<str:short_code>/", URLDetailView.as_view(), name="url-detail"),
     path(

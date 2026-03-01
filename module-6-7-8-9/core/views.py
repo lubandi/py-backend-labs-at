@@ -108,3 +108,41 @@ class HealthCheckView(APIView):
             health_status["status"] = "unhealthy"
 
         return Response(health_status, status=status_code)
+
+
+class UpgradeToPremiumView(APIView):
+    from rest_framework.permissions import IsAuthenticated
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["Auth"],
+        summary="Upgrade to Premium",
+        description="Upgrades the authenticated user's tier from Free to Premium.",
+        responses={
+            200: {
+                "type": "object",
+                "properties": {"message": {"type": "string"}},
+            },
+            400: {
+                "type": "object",
+                "properties": {"error": {"type": "string"}},
+            },
+        },
+    )
+    def post(self, request, version=None, *args, **kwargs):
+        user = request.user
+        if user.tier == "Premium" or user.is_premium:
+            return Response(
+                {"error": "User is already a Premium member."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.tier = "Premium"
+        user.is_premium = True
+        user.save(update_fields=["tier", "is_premium"])
+
+        return Response(
+            {"message": "Successfully upgraded to Premium tier!"},
+            status=status.HTTP_200_OK,
+        )
