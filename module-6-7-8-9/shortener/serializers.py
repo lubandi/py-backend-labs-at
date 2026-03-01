@@ -72,8 +72,39 @@ class URLSerializer(serializers.ModelSerializer):
         ]
 
     def validate_custom_alias(self, value):
-        if value == "":
+        if not value:
             return None
+
+        import re
+
+        from rest_framework.exceptions import ValidationError
+
+        if not re.match(r"^[a-zA-Z0-9_-]+$", value):
+            raise ValidationError(
+                "Custom alias can only contain alphanumeric characters, hyphens, and underscores."
+            )
+
+        reserved_words = [
+            "admin",
+            "api",
+            "health",
+            "schema",
+            "redoc",
+            "swagger-ui",
+            "auth",
+            "urls",
+        ]
+        if value.lower() in reserved_words:
+            raise ValidationError("This alias is reserved and cannot be used.")
+
+        # Check uniqueness against short_code to cover both auto-generated and aliases
+        query = URL.objects.filter(short_code=value)
+        if self.instance:
+            query = query.exclude(pk=self.instance.pk)
+
+        if query.exists():
+            raise ValidationError("This custom alias is already in use.")
+
         return value
 
     def to_representation(self, instance):
