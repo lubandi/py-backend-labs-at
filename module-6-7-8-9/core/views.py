@@ -36,6 +36,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = []
 
     @extend_schema(tags=["Health"], summary="System Health Check")
     def get(self, request, *args, **kwargs):
@@ -55,12 +56,19 @@ class HealthCheckView(APIView):
         # Check Redis
         try:
             from django_redis import get_redis_connection
+            from redis.exceptions import RedisError
 
             con = get_redis_connection("default")
             con.ping()
             health_status["services"]["redis"] = "healthy"
+        except RedisError:
+            health_status["services"]["redis"] = "unhealthy"
+            status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         except Exception:
             health_status["services"]["redis"] = "unhealthy"
             status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+        if status_code != status.HTTP_200_OK:
+            health_status["status"] = "unhealthy"
 
         return Response(health_status, status=status_code)
