@@ -93,7 +93,10 @@ class HealthCheckView(APIView):
             preview_url = getattr(
                 settings, "PREVIEW_SERVICE_URL", "http://preview-service:8001/extract/"
             )
-            response = httpx.options(preview_url, timeout=2.0)
+            token = getattr(settings, "MICROSERVICE_TOKEN", "local-dev-secret-token")
+            response = httpx.options(
+                preview_url, timeout=2.0, headers={"X-Microservice-Token": token}
+            )
             # 200 OK, 204 No Content, or 405 Method Not Allowed mean it's responding
             if response.status_code in [200, 204, 405, 400]:
                 health_status["services"]["preview"] = "healthy"

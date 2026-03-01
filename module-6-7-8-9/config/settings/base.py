@@ -43,6 +43,7 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1"])
 PREVIEW_SERVICE_URL = env(
     "PREVIEW_SERVICE_URL", default="http://preview-service:8001/extract/"
 )
+MICROSERVICE_TOKEN = env("MICROSERVICE_TOKEN", default="local-dev-secret-token")
 
 
 # Application definition

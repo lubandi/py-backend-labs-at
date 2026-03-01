@@ -2,14 +2,19 @@ import httpx
 import pybreaker
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .permissions import MicroserviceTokenAuthentication
 from .serializers import URLInputSerializer
 from .services import extract_url_metadata
 
 
 class ExtractMetadataView(APIView):
+    authentication_classes = [MicroserviceTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @extend_schema(
         request=URLInputSerializer,
         responses={200: dict, 400: dict},

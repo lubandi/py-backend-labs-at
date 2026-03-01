@@ -15,12 +15,14 @@ def fetch_url_metadata(url: str) -> dict:
     preview_url = getattr(
         settings, "PREVIEW_SERVICE_URL", "http://preview-service:8001/extract/"
     )
+    token = getattr(settings, "MICROSERVICE_TOKEN", "local-dev-secret-token")
 
     try:
         response = httpx.post(
             preview_url,
             json={"url": url},
             timeout=10.0,  # Give the preview service 10 seconds to respond
+            headers={"X-Microservice-Token": token},
         )
         if response.status_code == 200:
             return response.json()

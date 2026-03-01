@@ -59,6 +59,8 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "URL Preview Service API",
     "DESCRIPTION": "Microservice to fetch metadata (title, description, favicon) from URLs.",
     "VERSION": "1.0.0",
+    # Tell spectacular to use our custom security scheme globally
+    "SECURITY": [{"MicroserviceToken": []}],
 }
 
 MIDDLEWARE = [
@@ -142,3 +144,5 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MICROSERVICE_TOKEN = env("MICROSERVICE_TOKEN", default="local-dev-secret-token")
