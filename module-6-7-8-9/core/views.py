@@ -36,7 +36,9 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
-    throttle_classes = []
+    throttle_classes = (
+        []
+    )  # you don't want to throttle health endpoints. health-check endpoints shouldn't be rate-limited (otherwise load balancers might think the server is down if they check too frequently).
 
     @extend_schema(tags=["Health"], summary="System Health Check")
     def get(self, request, *args, **kwargs):
