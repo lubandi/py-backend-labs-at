@@ -106,6 +106,9 @@ class HealthCheckView(APIView):
 
         if status_code != status.HTTP_200_OK:
             health_status["status"] = "unhealthy"
+            from core.exceptions import ServiceUnavailableException
+
+            raise ServiceUnavailableException(detail=health_status)
 
         return Response(health_status, status=status_code)
 
@@ -133,10 +136,9 @@ class UpgradeToPremiumView(APIView):
     def post(self, request, version=None, *args, **kwargs):
         user = request.user
         if user.tier == "Premium" or user.is_premium:
-            return Response(
-                {"error": "User is already a Premium member."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            from rest_framework.exceptions import ValidationError
+
+            raise ValidationError("User is already a Premium member.")
 
         user.tier = "Premium"
         user.is_premium = True

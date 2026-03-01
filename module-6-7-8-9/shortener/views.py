@@ -65,17 +65,15 @@ class URLCreateView(APIView):
             # TIER CHECK: Free users max 10 URLs
             if request.user.tier == "Free":
                 if request.user.url_set.count() >= 10:
-                    return Response(
-                        {
-                            "error": "Free tier limit reached. Upgrade to Premium for unlimited URLs."
-                        },
-                        status=status.HTTP_403_FORBIDDEN,
-                    )
+                    from core.exceptions import TierLimitExceededException
+
+                    raise TierLimitExceededException()
                 # TIER CHECK: Free users cannot set custom aliases
                 if serializer.validated_data.get("custom_alias"):
-                    return Response(
-                        {"error": "Custom aliases are a Premium feature."},
-                        status=status.HTTP_403_FORBIDDEN,
+                    from core.exceptions import PremiumFeatureException
+
+                    raise PremiumFeatureException(
+                        "Custom aliases are a Premium feature."
                     )
 
             custom_alias = serializer.validated_data.get("custom_alias")
@@ -135,17 +133,17 @@ class URLRedirectView(APIView):
                 logger.warning(
                     "Attempted to access inactive URL", extra={"short_code": short_code}
                 )
-                return Response(
-                    {"error": "This URL is inactive."}, status=status.HTTP_410_GONE
-                )
+                from rest_framework.exceptions import NotFound
+
+                raise NotFound("This URL is inactive.")
 
             if url.expires_at and timezone.now() > url.expires_at:
                 logger.warning(
                     "Attempted to access expired URL", extra={"short_code": short_code}
                 )
-                return Response(
-                    {"error": "This URL has expired."}, status=status.HTTP_410_GONE
-                )
+                from rest_framework.exceptions import NotFound
+
+                raise NotFound("This URL has expired.")
 
             target_url = url.original_url
 
