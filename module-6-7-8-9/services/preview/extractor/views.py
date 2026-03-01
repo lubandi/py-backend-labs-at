@@ -27,19 +27,18 @@ class ExtractMetadataView(APIView):
             metadata = extract_url_metadata(url)
             return Response(metadata)
         except pybreaker.CircuitBreakerError:
-            return Response(
-                {
-                    "error": "Too many recent failures for this domain. Circuit breaker is open. Please try again later."
-                },
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
+            from preview.exceptions import CircuitBreakerOpenException
+
+            raise CircuitBreakerOpenException()
         except httpx.RequestError as e:
-            return Response(
-                {"error": f"Failed to fetch URL (Network/Timeout): {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST,
+            from preview.exceptions import TargetNetworkException
+
+            raise TargetNetworkException(
+                detail=f"Failed to fetch URL (Network/Timeout): {str(e)}"
             )
         except httpx.HTTPStatusError as e:
-            return Response(
-                {"error": f"HTTP Error {e.response.status_code} from target website"},
-                status=status.HTTP_400_BAD_REQUEST,
+            from preview.exceptions import TargetHTTPException
+
+            raise TargetHTTPException(
+                detail=f"HTTP Error {e.response.status_code} from target website"
             )

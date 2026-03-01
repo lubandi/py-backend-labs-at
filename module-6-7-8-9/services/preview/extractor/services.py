@@ -88,7 +88,9 @@ def extract_url_metadata(url: str) -> dict:
     Raises Exception if the fetch fails or circuit breaker is open.
     """
     if not is_safe_url(url):
-        raise ValueError("Invalid or unsafe URL provided (SSRF Protection)")
+        from preview.exceptions import InvalidURLException
+
+        raise InvalidURLException("Invalid or unsafe URL provided (SSRF Protection)")
 
     response = fetch_url(url)
     response.raise_for_status()  # Catch 4xx errors here to raise Exception without tripping the breaker
