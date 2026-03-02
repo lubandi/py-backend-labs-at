@@ -61,29 +61,16 @@ def track_click_task(url_short_code, ip_address, user_agent):
         click.country = "Unknown"
         click.city = "Unknown"
 
-        if ip_address and ip_address not in ("127.0.0.1", "localhost", "::1"):
-            import httpx
-
-            try:
-                # Use a free GeoIP API
-                response = httpx.get(
-                    f"http://ip-api.com/json/{ip_address}", timeout=10.0
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("status") == "success":
-                        click.country = data.get("country") or "Unknown"
-                        click.city = data.get("city") or "Unknown"
-            except Exception:
-                # Silently fail or log the GeoIP error; don't crash the click tracking
-                pass
-
         click.save()
+
+        if ip_address and ip_address not in ("127.0.0.1", "localhost", "::1"):
+            # Defer GeoIP fetching to a dedicated, rate-limited background task
+            fetch_geoip_for_click.delay(click.id, ip_address)
+
         return {
             "action": "click_tracked",
             "short_code": url_short_code,
             "ip": ip_address,
-            "country": click.country,
         }
     except URL.DoesNotExist:
         # URL might have been deleted before task ran
@@ -92,6 +79,35 @@ def track_click_task(url_short_code, ip_address, user_agent):
             "short_code": url_short_code,
             "status": "error",
             "reason": "URL not found",
+        }
+
+
+@shared_task(rate_limit="40/m")
+def fetch_geoip_for_click(click_id, ip_address):
+    """
+    Dedicated task to fetch GeoIP data for a click.
+    Rate limited to 40 per minute to respect free API tiers (ip-api.com allows 45/m).
+    """
+    import httpx
+
+    try:
+        click = Click.objects.get(id=click_id)
+        response = httpx.get(f"http://ip-api.com/json/{ip_address}", timeout=10.0)
+
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("status") == "success":
+                click.country = data.get("country") or "Unknown"
+                click.city = data.get("city") or "Unknown"
+                click.save(update_fields=["country", "city"])
+
+        return {"action": "geoip_fetched", "click_id": click_id, "status": "success"}
+    except (Click.DoesNotExist, httpx.RequestError) as e:
+        return {
+            "action": "geoip_fetched",
+            "click_id": click_id,
+            "status": "failed",
+            "error": str(e),
         }
 
 
